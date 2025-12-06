@@ -1,0 +1,486 @@
+/* pages/farm/index.wxss */
+.farm-container {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 20rpx;
+}
+
+/* 轮播图 */
+.banner-section {
+  width: 100%;
+  height: 400rpx;
+}
+
+.banner-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tab内容区域 */
+.panorama-section,
+.monitor-section,
+.trace-section,
+.news-section {
+  padding: 20rpx;
+}
+
+/* 区块标题 */
+.section-header {
+  padding: 20rpx 0;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.title-icon {
+  margin-right: 12rpx;
+  font-size: 40rpx;
+}
+
+.title-text {
+  flex: 1;
+}
+
+.header-desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 卡片通用样式 */
+.panorama-card,
+.intro-card,
+.feature-section,
+.environment-card,
+.process-card,
+.scan-card,
+.report-card,
+.cert-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+/* 全景卡片 */
+.panorama-card {
+  position: relative;
+  height: 400rpx;
+  padding: 0;
+  overflow: hidden;
+}
+
+.panorama-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.panorama-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+}
+
+.overlay-text {
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: #fff;
+}
+
+/* 简介卡片 */
+.intro-content {
+  line-height: 1.8;
+  font-size: 28rpx;
+  color: #666;
+  text-indent: 2em;
+}
+
+/* 特色网格 */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx 20rpx;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12rpx;
+}
+
+.feature-icon {
+  font-size: 60rpx;
+  margin-bottom: 12rpx;
+}
+
+.feature-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 环境监测卡片 */
+.env-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.update-time {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.env-data {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 20rpx 0;
+}
+
+.env-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.env-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #07c160;
+  margin-bottom: 8rpx;
+}
+
+.env-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.env-divider {
+  width: 2rpx;
+  height: 60rpx;
+  background: #eee;
+}
+
+/* 监控视频列表 */
+.video-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.video-card {
+  position: relative;
+  height: 240rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.video-cover {
+  width: 100%;
+  height: 100%;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+}
+
+.video-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx;
+  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+}
+
+.video-name {
+  font-size: 24rpx;
+  color: #fff;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  background: rgba(255,59,48,0.9);
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  color: #fff;
+}
+
+.live-dot {
+  width: 12rpx;
+  height: 12rpx;
+  margin-right: 6rpx;
+  background: #fff;
+  border-radius: 50%;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* 养殖过程时间轴 */
+.process-timeline {
+  padding-left: 20rpx;
+}
+
+.timeline-item {
+  position: relative;
+  display: flex;
+  padding-left: 40rpx;
+  padding-bottom: 30rpx;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 15rpx;
+  top: 32rpx;
+  width: 2rpx;
+  height: calc(100% - 32rpx);
+  background: #e5e5e5;
+}
+
+.timeline-item:last-child::before {
+  display: none;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 8rpx;
+  width: 32rpx;
+  height: 32rpx;
+  border: 4rpx solid #07c160;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.timeline-desc {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+}
+
+/* 扫码溯源卡片 */
+.scan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 24rpx;
+}
+
+.scan-icon {
+  margin-bottom: 20rpx;
+}
+
+.scan-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.scan-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 检测报告列表 */
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.report-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+}
+
+.report-name {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.report-status {
+  padding: 6rpx 20rpx;
+  font-size: 24rpx;
+  border-radius: 20rpx;
+}
+
+.report-status.pass {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* 认证资质网格 */
+.cert-grid {
+  display: flex;
+  justify-content: space-around;
+}
+
+.cert-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cert-image {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 12rpx;
+}
+
+.cert-name {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 农庄动态列表 */
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.news-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.news-image {
+  width: 160rpx;
+  height: 120rpx;
+  margin-right: 20rpx;
+  border-radius: 8rpx;
+}
+
+.news-info {
+  flex: 1;
+}
+
+.news-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.news-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 全景弹窗 */
+.panorama-popup {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #eee;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.popup-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+}
+
+.tips {
+  font-size: 28rpx;
+  color: #999;
+}
+
+

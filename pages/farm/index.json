@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "生态农庄",
+  "usingComponents": {
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-image": "@vant/weapp/image/index",
+    "van-divider": "@vant/weapp/divider/index"
+  }
+}
+
+

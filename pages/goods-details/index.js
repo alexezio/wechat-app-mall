@@ -1,7 +1,7 @@
-const WXAPI = require('apifm-wxapi')
-const TOOLS = require('../../utils/tools.js')
-const AUTH = require('../../utils/auth')
 const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
+const TOOLS = require('../../utils/tools.js')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
 import Poster from 'wxa-plugin-canvas/poster/poster'
 
 Page({
@@ -229,8 +229,17 @@ Page({
         buyNumMax: goodsDetailRes.data.basicInfo.stores,
         buyNumber: (goodsDetailRes.data.basicInfo.stores > 0) ? 1 : 0
       }
-      if (goodsDetailRes.data.properties) {
+      
+      // 初始化默认选中的规格信息
+      if (goodsDetailRes.data.properties && goodsDetailRes.data.properties.length > 0) {
         _data.hasMoreSelect = true
+        
+        // 使用适配器返回的初始化数据
+        if (goodsDetailRes.data._initialCanSubmit) {
+          _data.canSubmit = true
+          _data.propertyChildIds = goodsDetailRes.data._initialPropertyChildIds
+          _data.propertyChildNames = goodsDetailRes.data._initialPropertyChildNames
+        }
       }
       if (goodsDetailRes.data.basicInfo.shopId) {
         this.shopSubdetail(goodsDetailRes.data.basicInfo.shopId)
@@ -443,7 +452,8 @@ Page({
     let originalPrice = this.data.goodsDetail.basicInfo.originalPrice
     let totalScoreToPay = this.data.goodsDetail.basicInfo.minScore
     let buyNumMax = this.data.goodsDetail.basicInfo.stores
-    let buyNumber = this.data.goodsDetail.basicInfo.minBuyNumber
+    // 保持当前的购买数量，如果没有则使用默认值
+    let buyNumber = this.data.buyNumber || this.data.goodsDetail.basicInfo.minBuyNumber || 1
     if (this.data.shopType == 'toPingtuan') {
       price = this.data.goodsDetail.basicInfo.pingtuanPrice
     }
@@ -575,15 +585,10 @@ Page({
     }
     const token = wx.getStorageSync('token')
     const goodsId = this.data.goodsDetail.basicInfo.id
-    const sku = []
-    if (this.data.goodsDetail.properties) {
-      this.data.goodsDetail.properties.forEach(p => {
-        sku.push({
-          optionId: p.id,
-          optionValueId: p.optionValueId
-        })
-      })
-    }
+    
+    // 使用已经计算好的 propertyChildIds 字符串（去掉末尾逗号）
+    const sku = this.data.propertyChildIds ? this.data.propertyChildIds.replace(/,+$/g, '') : ''
+    
     const res = await WXAPI.shippingCarInfoAddItem(token, goodsId, this.data.buyNumber, sku, goodsAddition)
     if (res.code != 0) {
       wx.showToast({

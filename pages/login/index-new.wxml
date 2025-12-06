@@ -3,7 +3,7 @@
   
   <!-- Logo区域 -->
   <view class="logo-section">
-    <view class="logo-placeholder">🌿</view>
+    <image class="logo" src="/images/logo.png" mode="aspectFit" />
     <text class="app-name">生鲜商城</text>
     <text class="slogan">新鲜好货，实惠到家</text>
   </view>

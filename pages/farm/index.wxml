@@ -1,0 +1,274 @@
+<!-- pages/farm/index.wxml -->
+<view class="farm-container">
+  
+  <!-- 轮播图 -->
+  <view class="banner-section" wx:if="{{banners.length > 0}}">
+    <swiper class="banner-swiper" indicator-dots circular autoplay>
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <image class="banner-image" src="{{item.picUrl}}" mode="aspectFill" />
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- Tab标签 -->
+  <van-tabs active="{{ activeTab }}" bind:change="onTabChange" color="#07c160" line-width="60rpx">
+    <van-tab title="全景展示">
+      <!-- 全景展示区域 -->
+      <view class="panorama-section">
+        <view class="section-header">
+          <view class="header-title">
+            <text class="title-icon">🏞️</text>
+            <text class="title-text">农庄全景</text>
+          </view>
+          <view class="header-desc">360°实景展示</view>
+        </view>
+        
+        <view class="panorama-card" bindtap="showPanorama">
+          <image class="panorama-preview" src="/images/farm-panorama.jpg" mode="aspectFill" />
+          <view class="panorama-overlay">
+            <van-icon name="eye-o" size="60rpx" color="#fff" />
+            <text class="overlay-text">查看全景</text>
+          </view>
+        </view>
+
+        <!-- 农庄简介 -->
+        <view class="intro-card">
+          <view class="card-title">
+            <text class="title-icon">🌱</text>
+            <text>农庄简介</text>
+          </view>
+          <view class="intro-content">
+            <text>{{farmIntro}}</text>
+          </view>
+        </view>
+
+        <!-- 养殖特色 -->
+        <view class="feature-section">
+          <view class="card-title">
+            <text class="title-icon">⭐</text>
+            <text>养殖特色</text>
+          </view>
+          <view class="feature-grid">
+            <view class="feature-item">
+              <view class="feature-icon">🏔️</view>
+              <view class="feature-name">山林散养</view>
+              <view class="feature-desc">500亩生态山林</view>
+            </view>
+            <view class="feature-item">
+              <view class="feature-icon">🌾</view>
+              <view class="feature-name">天然饲料</view>
+              <view class="feature-desc">虫草玉米喂养</view>
+            </view>
+            <view class="feature-item">
+              <view class="feature-icon">💊</view>
+              <view class="feature-name">无抗养殖</view>
+              <view class="feature-desc">零抗生素添加</view>
+            </view>
+            <view class="feature-item">
+              <view class="feature-icon">⏱️</view>
+              <view class="feature-name">足龄出栏</view>
+              <view class="feature-desc">180天以上</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </van-tab>
+
+    <van-tab title="实时监控">
+      <!-- 实时监控区域 -->
+      <view class="monitor-section">
+        <view class="section-header">
+          <view class="header-title">
+            <text class="title-icon">📹</text>
+            <text class="title-text">养殖区监控</text>
+          </view>
+          <view class="header-desc">24小时实时监控</view>
+        </view>
+
+        <!-- 环境数据 -->
+        <view class="environment-card">
+          <view class="env-title">
+            <text class="title-icon">🌡️</text>
+            <text>环境监测</text>
+            <text class="update-time">更新时间: {{environmentData.updateTime}}</text>
+          </view>
+          <view class="env-data">
+            <view class="env-item">
+              <view class="env-value">{{environmentData.temperature}}</view>
+              <view class="env-label">温度</view>
+            </view>
+            <view class="env-divider"></view>
+            <view class="env-item">
+              <view class="env-value">{{environmentData.humidity}}</view>
+              <view class="env-label">湿度</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 监控视频列表 -->
+        <view class="video-list">
+          <view class="video-card" wx:for="{{videos}}" wx:key="id" bindtap="playVideo" data-id="{{item.id}}">
+            <image class="video-cover" src="{{item.cover}}" mode="aspectFill" />
+            <view class="video-overlay">
+              <van-icon name="play-circle-o" size="80rpx" color="#fff" />
+            </view>
+            <view class="video-info">
+              <text class="video-name">{{item.name}}</text>
+              <view class="live-badge">
+                <view class="live-dot"></view>
+                <text>直播中</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 养殖过程展示 -->
+        <view class="process-card">
+          <view class="card-title">
+            <text class="title-icon">📖</text>
+            <text>养殖日记</text>
+          </view>
+          <view class="process-timeline">
+            <view class="timeline-item">
+              <view class="timeline-dot"></view>
+              <view class="timeline-content">
+                <view class="timeline-title">鸡苗入场</view>
+                <view class="timeline-desc">选用优质鸡苗，确保基因健康</view>
+              </view>
+            </view>
+            <view class="timeline-item">
+              <view class="timeline-dot"></view>
+              <view class="timeline-content">
+                <view class="timeline-title">散养阶段</view>
+                <view class="timeline-desc">山林自由觅食，增强体质</view>
+              </view>
+            </view>
+            <view class="timeline-item">
+              <view class="timeline-dot"></view>
+              <view class="timeline-content">
+                <view class="timeline-title">健康检测</view>
+                <view class="timeline-desc">定期兽医检查，确保健康</view>
+              </view>
+            </view>
+            <view class="timeline-item">
+              <view class="timeline-dot"></view>
+              <view class="timeline-content">
+                <view class="timeline-title">足龄出栏</view>
+                <view class="timeline-desc">180天以上，肉质鲜美</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </van-tab>
+
+    <van-tab title="质量溯源">
+      <!-- 质量溯源区域 -->
+      <view class="trace-section">
+        <view class="section-header">
+          <view class="header-title">
+            <text class="title-icon">🔍</text>
+            <text class="title-text">产品溯源</text>
+          </view>
+          <view class="header-desc">扫码查询养殖全程</view>
+        </view>
+
+        <!-- 扫码溯源 -->
+        <view class="scan-card" bindtap="scanTrace">
+          <view class="scan-icon">
+            <van-icon name="scan" size="100rpx" color="#07c160" />
+          </view>
+          <view class="scan-title">扫描溯源码</view>
+          <view class="scan-desc">查看产品完整养殖档案</view>
+        </view>
+
+        <!-- 质量检测报告 -->
+        <view class="report-card">
+          <view class="card-title">
+            <text class="title-icon">📋</text>
+            <text>质量检测报告</text>
+          </view>
+          <view class="report-list">
+            <view class="report-item">
+              <view class="report-name">兽药残留检测</view>
+              <view class="report-status pass">已通过</view>
+            </view>
+            <view class="report-item">
+              <view class="report-name">重金属检测</view>
+              <view class="report-status pass">已通过</view>
+            </view>
+            <view class="report-item">
+              <view class="report-name">微生物检测</view>
+              <view class="report-status pass">已通过</view>
+            </view>
+            <view class="report-item">
+              <view class="report-name">营养成分检测</view>
+              <view class="report-status pass">已通过</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 认证资质 -->
+        <view class="cert-card">
+          <view class="card-title">
+            <text class="title-icon">🏆</text>
+            <text>认证资质</text>
+          </view>
+          <view class="cert-grid">
+            <view class="cert-item">
+              <image class="cert-image" src="/images/cert-1.png" mode="aspectFit" />
+              <text class="cert-name">有机认证</text>
+            </view>
+            <view class="cert-item">
+              <image class="cert-image" src="/images/cert-2.png" mode="aspectFit" />
+              <text class="cert-name">无公害认证</text>
+            </view>
+            <view class="cert-item">
+              <image class="cert-image" src="/images/cert-3.png" mode="aspectFit" />
+              <text class="cert-name">ISO认证</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </van-tab>
+
+    <van-tab title="农庄动态">
+      <!-- 农庄动态区域 -->
+      <view class="news-section">
+        <view class="section-header">
+          <view class="header-title">
+            <text class="title-icon">📰</text>
+            <text class="title-text">最新动态</text>
+          </view>
+        </view>
+
+        <view class="news-list">
+          <view class="news-item" wx:for="{{farmNews}}" wx:key="id" bindtap="goNewsDetail" data-id="{{item.id}}">
+            <image class="news-image" src="{{item.image}}" mode="aspectFill" />
+            <view class="news-info">
+              <view class="news-title">{{item.title}}</view>
+              <view class="news-date">{{item.date}}</view>
+            </view>
+            <van-icon name="arrow" />
+          </view>
+        </view>
+      </view>
+    </van-tab>
+  </van-tabs>
+</view>
+
+<!-- 全景弹窗 -->
+<van-popup show="{{showPanorama}}" position="center" custom-style="width: 90%; height: 80%; border-radius: 16rpx;" bind:close="hidePanorama">
+  <view class="panorama-popup">
+    <view class="popup-header">
+      <text>农庄全景</text>
+      <van-icon name="cross" bind:click="hidePanorama" />
+    </view>
+    <view class="popup-content">
+      <text class="tips">全景功能需要接入第三方全景服务</text>
+      <!-- 这里接入全景展示组件 -->
+    </view>
+  </view>
+</van-popup>
+
+

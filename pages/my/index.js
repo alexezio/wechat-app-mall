@@ -1,7 +1,13 @@
-const WXAPI = require('apifm-wxapi')
-const AUTH = require('../../utils/auth')
-const TOOLS = require('../../utils/tools.js')
 const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
+const TOOLS = require('../../utils/tools.js')
+
+// 辅助函数：获取token
+function getToken() {
+  return CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
+}
+
 Page({
 	data: {
     balance:0.00,
@@ -60,7 +66,7 @@ Page({
     })
   },
   async getUserApiInfo() {
-    const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+    const res = await WXAPI.userDetail(getToken())
     if (res.code == 0) {
       let _data = {}
       _data.apiUserInfoMap = res.data
@@ -80,7 +86,7 @@ Page({
     }
   },
   async memberCheckedChange() {
-    const res = await WXAPI.peisongMemberChangeWorkStatus(wx.getStorageSync('token'))
+    const res = await WXAPI.peisongMemberChangeWorkStatus(getToken())
     if (res.code != 0) {
       wx.showToast({
         title: res.msg,
@@ -92,7 +98,7 @@ Page({
   },
   getUserAmount: function () {
     var that = this;
-    WXAPI.userAmount(wx.getStorageSync('token')).then(function (res) {
+    WXAPI.userAmount(getToken()).then(function (res) {
       if (res.code == 0) {
         that.setData({
           balance: res.data.balance.toFixed(2),
@@ -107,7 +113,7 @@ Page({
     return count > 99 ? '99+' : count;
   },
   orderStatistics: function () {
-    WXAPI.orderStatistics(wx.getStorageSync('token')).then((res) => {
+    WXAPI.orderStatistics(getToken()).then((res) => {
       if (res.code == 0) {
         const {
           count_id_no_confirm,
@@ -168,7 +174,7 @@ Page({
     })
   },
   async cardMyList() {
-    const res = await WXAPI.cardMyList(wx.getStorageSync('token'))
+    const res = await WXAPI.cardMyList(getToken())
     if (res.code == 0) {
       const myCards = res.data.filter(ele => { return ele.status == 0 })
       if (myCards.length > 0) {
@@ -192,7 +198,7 @@ Page({
       return
     }
     const postData = {
-      token: wx.getStorageSync('token'),
+      token: getToken(),
       nick: this.data.nick,
     }
     // https://www.yuque.com/apifm/nu0f75/ykr2zr
@@ -213,7 +219,7 @@ Page({
   async onChooseAvatar(e) {
     console.log(e);
     const avatarUrl = e.detail.avatarUrl
-    let res = await WXAPI.uploadFileV2(wx.getStorageSync('token'), avatarUrl)
+    let res = await WXAPI.uploadFileV2(getToken(), avatarUrl)
     if (res.code != 0) {
       wx.showToast({
         title: res.msg,
@@ -223,7 +229,7 @@ Page({
     }
     // https://www.yuque.com/apifm/nu0f75/ykr2zr
     res = await WXAPI.modifyUserInfoV2({
-      token: wx.getStorageSync('token'),
+      token: getToken(),
       avatarUrl: res.data.url,
     })
     if (res.code != 0) {

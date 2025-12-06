@@ -1,16 +1,4 @@
-<van-search placeholder="请输入搜索关键词" shape="round" readonly bindtap="goSearch"></van-search>
-<navigator wx:if="{{shopInfo}}" url="/pages/shop/select">
-  <view class="jd-shop-selector">
-    <view class="jd-shop-info">
-      <image src="/images/order-details/icon-address.png"></image>
-      <text class="jd-shop-name">{{shopInfo.name}}</text>
-    </view>
-    <view class="jd-shop-change">
-      <text>切换</text>
-      <image src="/images/icon/next.png"></image>
-    </view>
-  </view>
-</navigator>
+<van-search placeholder="搜索鸡禽、水产等生鲜产品" shape="round" readonly bindtap="goSearch"></van-search>
 <wxs module="goodsDetailPage">
 module.exports = {
   url : function(item) {
@@ -126,7 +114,7 @@ module.exports = {
     <view class="jd-section-header">
       <view class="jd-section-title">
         <image class="jd-section-icon" src="../../images/home/recommend.png"></image>
-        <text class="jd-section-name">爆品推荐</text>
+        <text class="jd-section-name">精选推荐</text>
       </view>
       <view class="jd-section-more">更多 ></view>
     </view>
@@ -223,8 +211,9 @@ module.exports = {
   <view class="jd-section-header">
     <view class="jd-section-title">
       <image class="jd-section-icon" src="../../images/home/goodslist.png"></image>
-      <text class="jd-section-name">为你推荐</text>
+      <text class="jd-section-name">新鲜好货</text>
     </view>
+    <view class="jd-section-desc">天然无抗 · 健康生活</view>
   </view>
   <view class="jd-goods-grid">
     <view class="jd-goods-card" wx:for="{{goods}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.id}}" data-supplytype="{{item.supplyType}}" data-yyid="{{item.yyId}}">

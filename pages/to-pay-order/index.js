@@ -1,6 +1,11 @@
 const CONFIG = require('../../config.js')
-const WXAPI = require('apifm-wxapi')
-const AUTH = require('../../utils/auth')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
+
+// 辅助函数：获取token
+function getToken() {
+  return CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : getToken()
+}
 
 Date.prototype.format = function(format) {
   var date = {
@@ -88,7 +93,7 @@ Page({
   async doneShow() {
     let goodsList = []
     let shopList = []
-    const token = wx.getStorageSync('token')
+    const token = getToken()
     //立即购买下单
     if ("buyNow" == this.data.orderType) {
       var buyNowInfoMem = wx.getStorageSync('buyNowInfo');
@@ -100,7 +105,16 @@ Page({
       //购物车下单
       if (this.data.shopCarType == 0) {//自营购物车
         var res = await WXAPI.shippingCarInfo(token)
-        shopList = res.data.shopList
+        console.log('[确认订单] 购物车数据:', res)
+        if (res.code == 0 && res.data) {
+          shopList = res.data.shopList || []
+        } else {
+          wx.showToast({
+            title: res.msg || '获取购物车失败',
+            icon: 'none'
+          })
+          return
+        }
       } else if (this.data.shopCarType == 1) {//云货架购物车
         var res = await WXAPI.jdvopCartInfoV2(token)
         shopList = [{
@@ -110,7 +124,7 @@ Page({
           serviceDistance: 99999999
         }]
       }
-      if (res.code == 0) {
+      if (res.code == 0 && res.data) {
         goodsList = res.data.items.filter(ele => {
           return ele.selected
         })
@@ -180,7 +194,7 @@ Page({
     this.cardMyList()
   },
   async userAmount() {
-    const res = await WXAPI.userAmount(wx.getStorageSync('token'))
+    const res = await WXAPI.userAmount(getToken())
     const order_pay_user_balance = wx.getStorageSync('order_pay_user_balance')
     if (res.code == 0) {
       this.setData({
@@ -207,7 +221,7 @@ Page({
     })
     // 检测实名认证状态
     if (wx.getStorageSync('needIdCheck') == 1) {
-      const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+      const res = await WXAPI.userDetail(getToken())
       if (res.code == 0 && !res.data.base.isIdcardCheck) {
         wx.navigateTo({
           url: '/pages/idCheck/index',
@@ -238,7 +252,7 @@ Page({
   },
   async createOrder(e) {
     // shopCarType: 0 //0自营购物车，1云货架购物车
-    const loginToken = wx.getStorageSync('token') // 用户登录 token
+    const loginToken = getToken() // 用户登录 token
     const postData = {
       token: loginToken,
       goodsJsonStr: this.data.goodsJsonStr,
@@ -617,10 +631,13 @@ Page({
       return
     }
     let orderId = ''
+    let orderNumber = ''
     if (res.data.orderIds && res.data.orderIds.length > 0) {
       orderId = res.data.orderIds.join()
+      orderNumber = res.data.orderNumbers ? res.data.orderNumbers.join() : ''
     } else {
       orderId = res.data.id
+      orderNumber = res.data.orderNumber || res.data.order_number || ''
     }
     // 直接弹出支付，取消支付的话，去订单列表
     await this.userAmount()
@@ -652,7 +669,7 @@ Page({
           success: res2 => {
             if (res2.confirm) {
               // 使用余额支付
-              WXAPI.orderPay(wx.getStorageSync('token'), orderId).then(res3 => {
+              WXAPI.orderPay(getToken(), orderNumber || orderId).then(res3 => {
                 if (res3.code != 0) {
                   wx.showToast({
                     title: res3.msg,
@@ -683,11 +700,13 @@ Page({
               // 使用余额支付
               this.setData({
                 orderId,
+                orderNumber,
                 money,
                 paymentShow: true,
                 nextAction: {
                   type: 0,
-                  id: orderId
+                  id: orderId,
+                  orderNumber: orderNumber || orderId
                 }
               })
             } else {
@@ -712,7 +731,7 @@ Page({
     }
   },
   async initShippingAddress() {
-    const res = await WXAPI.defaultAddress(wx.getStorageSync('token'))
+    const res = await WXAPI.defaultAddress(getToken())
     if (res.code == 0) {
       this.setData({
         curAddressData: res.data.info
@@ -743,14 +762,23 @@ Page({
         isNeedLogistics = 1;
       }
 
-      const _goodsJsonStr = {
-        propertyChildIds: carShopBean.propertyChildIds
-      }
+      // 构造规格字符串，过滤 undefined 并去掉多余逗号
+      let propertyChildIds = carShopBean.propertyChildIds || ''
       if (carShopBean.sku && carShopBean.sku.length > 0) {
-        let propertyChildIds = ''
-        carShopBean.sku.forEach(option => {
-          propertyChildIds = propertyChildIds + ',' + option.optionId + ':' + option.optionValueId
-        })
+        propertyChildIds = carShopBean.sku
+          .map(option => `${option.optionId}:${option.optionValueId}`)
+          .join(',')
+      }
+      if (propertyChildIds) {
+        propertyChildIds = propertyChildIds
+          .replace(/undefined:undefined/g, '')
+          .replace(/^,|,$/g, '')
+          .replace(/,{2,}/g, ',')
+          .replace(/^,|,$/g, '')
+      }
+
+      const _goodsJsonStr = {}
+      if (propertyChildIds) {
         _goodsJsonStr.propertyChildIds = propertyChildIds
       }
       if (carShopBean.additions && carShopBean.additions.length > 0) {
@@ -765,6 +793,7 @@ Page({
       }
       _goodsJsonStr.goodsId = carShopBean.goodsId
       _goodsJsonStr.number = carShopBean.number
+      _goodsJsonStr.price = carShopBean.price // 添加商品价格
       _goodsJsonStr.logisticsType = 0
       _goodsJsonStr.inviter_id = inviter_id
       goodsJsonStr.push(_goodsJsonStr)
@@ -872,7 +901,7 @@ Page({
     })
   },
   async getUserApiInfo() {
-    const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+    const res = await WXAPI.userDetail(getToken())
     if (res.code == 0) {
       let bindMobileStatus = res.data.base.mobile ? 1 : 2 // 账户绑定的手机号码状态
       if (this.data.needBindMobile != 1) {
@@ -952,7 +981,7 @@ Page({
     })
   },
   async cardMyList() {
-    const res = await WXAPI.cardMyList(wx.getStorageSync('token'))
+    const res = await WXAPI.cardMyList(getToken())
     if (res.code == 0) {
       const myCards = res.data.filter(ele => { return ele.status == 0 && ele.amount > 0 && ele.cardInfo.refs })
       if (myCards.length > 0) {

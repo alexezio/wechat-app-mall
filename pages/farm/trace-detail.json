@@ -1,7 +1,8 @@
 {
-  "navigationBarTitleText": "登录",
+  "navigationBarTitleText": "产品溯源",
   "enablePullDownRefresh": false,
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index"
   }
 }
+

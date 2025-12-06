@@ -1,4 +1,5 @@
-const WXAPI = require('apifm-wxapi');
+const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
 const { wxaCode } = require('../../utils/auth');
 Component({
   options: {
@@ -60,30 +61,16 @@ Component({
       });
     },
     async submit() {
-      const postData = {
-        token: wx.getStorageSync('token'),
-        money: this.data.money,
-        remark: this.data.remark,
+      const orderNumber = this.data.nextAction && (this.data.nextAction.orderNumber || this.data.nextAction.id)
+      if (!orderNumber) {
+        wx.showModal({
+          content: '缺少订单号，无法发起支付',
+          showCancel: false
+        })
+        this.close()
+        return
       }
-      if (this.data.extData) {
-        postData = {
-          ...postData,
-          ...this.data.extData
-        }
-      }
-      if (this.data.nextAction) {
-        postData.nextAction = JSON.stringify(this.data.nextAction)
-      }
-      postData.payName = postData.remark
-      const url = wx.getStorageSync('wxpay_api_url')
-      let res
-      if (this.data.payType == 'wx') {
-        // https://www.yuque.com/apifm/nu0f75/ppadt8
-        res = await WXAPI.payVariableUrl(url ? url : '/pay/wx/wxapp', postData)
-      } else if (this.data.payType == 'alipay') {
-        // https://www.yuque.com/apifm/nu0f75/hguh83ekxsh71cn7
-        res = await WXAPI.alipayQrcode(postData)
-      } else {
+      if (this.data.payType !== 'wx') {
         wx.showModal({
           content: '暂不支持该支付方式',
           showCancel: false
@@ -91,57 +78,39 @@ Component({
         this.close()
         return
       }
-      if (res.code != 0) {
+
+      // 调用新后端支付接口
+      const res = await WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { pay_type: 'wxpay' })
+      if (res.code != 0 || !res.data) {
         wx.showModal({
-          content: JSON.stringify(res),
+          content: res.msg || '获取支付参数失败',
           showCancel: false
         })
         this.close()
         return
       }
-      if (this.data.payType == 'wx') {
-        wx.requestPayment({
-          timeStamp: res.data.timeStamp,
-          nonceStr: res.data.nonceStr,
-          package: res.data.package,
-          signType: res.data.signType,
-          paySign: res.data.paySign,
-          fail: aaa => {
-            console.error(aaa)
-            wx.showToast({
-              title: '支付失败:' + aaa,
-              icon: 'none'
-            })
-          },
-          success: () => {
-            wx.showToast({
-              title: '支付成功'
-            })
-            this.triggerEvent('ok', this.data)
-          }
-        })
-      }
-      if (this.data.payType == 'alipay') {
-        const qrcodeRes = JSON.parse(res.data.qrcode)
-        const alipayQrcode = qrcodeRes.alipay_trade_precreate_response.qr_code
-        console.log(alipayQrcode);
-        // 生成二维码 https://www.yuque.com/apifm/nu0f75/xrnyo9
-        const resQrcode = await WXAPI.commonQrcode({
-          content: alipayQrcode,
-          width: 650
-        })
-        if (resQrcode.code != 0) {
+
+      const payParams = res.data.wxpay_params || res.data
+      wx.requestPayment({
+        timeStamp: payParams.timeStamp,
+        nonceStr: payParams.nonceStr,
+        package: payParams.package,
+        signType: payParams.signType || payParams.sign_type || 'RSA',
+        paySign: payParams.paySign || payParams.pay_sign,
+        fail: err => {
+          console.error(err)
           wx.showToast({
-            title: '无法获取二维码',
+            title: '支付失败:' + (err.errMsg || ''),
             icon: 'none'
           })
-          return
+        },
+        success: () => {
+          wx.showToast({
+            title: '支付成功'
+          })
+          this.triggerEvent('ok', this.data)
         }
-        console.log(resQrcode.data);
-        this.setData({
-          alipayQrcode: resQrcode.data
-        })
-      }
+      })
     },
   }
 })

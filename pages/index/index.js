@@ -1,6 +1,7 @@
-const WXAPI = require('apifm-wxapi')
+const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
 const TOOLS = require('../../utils/tools.js')
-const AUTH = require('../../utils/auth')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
 const APP = getApp()
 
 Page({
@@ -20,9 +21,25 @@ Page({
   },
   tabClick(e) {
     // 商品分类点击
+    const categoryId = e.currentTarget.dataset.id
+    console.log('[首页] 点击分类, ID:', categoryId)
+    console.log('[首页] 当前分类列表:', this.data.categories)
+    
     const category = this.data.categories.find(ele => {
-      return ele.id == e.currentTarget.dataset.id
+      return ele.id == categoryId
     })
+    
+    if (!category) {
+      console.error('[首页] 未找到分类:', categoryId)
+      wx.showToast({
+        title: '分类不存在',
+        icon: 'none'
+      })
+      return
+    }
+    
+    console.log('[首页] 找到分类:', category)
+    
     if (category.vopCid1 || category.vopCid2) {
       wx.navigateTo({
         url: '/pages/goods/list-vop?cid1=' + (category.vopCid1 ? category.vopCid1 : '') + '&cid2=' + (category.vopCid2 ? category.vopCid2 : ''),
@@ -234,13 +251,23 @@ Page({
   },
   async categories(){
     const res = await WXAPI.goodsCategory()
+    console.log('[首页] 分类接口返回:', res)
+    
     let categories = [];
     if (res.code == 0) {
-      const _categories = res.data.filter(ele => {
-        return ele.level == 1
-      })
-      categories = categories.concat(_categories)
+      if (res.data && Array.isArray(res.data)) {
+        const _categories = res.data.filter(ele => {
+          return ele.level == 1
+        })
+        categories = categories.concat(_categories)
+        console.log('[首页] 一级分类数量:', categories.length, categories)
+      } else {
+        console.error('[首页] 分类数据格式错误:', res.data)
+      }
+    } else {
+      console.error('[首页] 分类接口失败:', res)
     }
+    
     this.setData({
       categories: categories,
       curPage: 1

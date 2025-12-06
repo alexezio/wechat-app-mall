@@ -1,8 +1,10 @@
-const WXAPI = require('apifm-wxapi')
+const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
 
 Page({
   data: {
     page: 1,
+    totalPage: 1,
     tabIndex: 0,
     statusType: [
       {
@@ -82,6 +84,7 @@ Page({
     // 防止连续点击--结束
     const that = this;
     const orderId = e.currentTarget.dataset.id;
+    const orderNumber = e.currentTarget.dataset.orderNumber;
     let money = e.currentTarget.dataset.money;
     const needScore = e.currentTarget.dataset.score;
     WXAPI.userAmount(wx.getStorageSync('token')).then(function(res) {
@@ -117,7 +120,7 @@ Page({
           success: function (res) {
             console.log(res);
             if (res.confirm) {
-              that._toPayTap(orderId, money)
+              that._toPayTap(orderId, orderNumber, money)
             } else {
               console.log('用户点击取消支付')
             }
@@ -133,30 +136,31 @@ Page({
     })
   },
   async wxSphGetpaymentparams(e) {
-    const orderId = e.currentTarget.dataset.id
-    const res = await WXAPI.wxSphGetpaymentparams(wx.getStorageSync('token'), orderId)
-    if (res.code != 0) {
+    const orderNumber = e.currentTarget.dataset.orderNumber
+    const res = await WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { pay_type: 'wxpay' })
+    if (res.code != 0 || !res.data) {
       wx.showToast({
-        title: res.msg,
+        title: res.msg || '获取支付参数失败',
         icon: 'none'
       })
       return;
     }
+    const payParams = res.data.wxpay_params || res.data
     // 发起支付
     wx.requestPayment({
-      timeStamp: res.data.timeStamp,
-      nonceStr: res.data.nonceStr,
-      package: res.data.package,
-      signType: res.data.signType,
-      paySign: res.data.paySign,
-      fail: aaa => {
-        console.error(aaa)
+      timeStamp: payParams.timeStamp,
+      nonceStr: payParams.nonceStr,
+      package: payParams.package,
+      signType: payParams.signType || payParams.sign_type || 'RSA',
+      paySign: payParams.paySign || payParams.pay_sign,
+      fail: err => {
+        console.error(err)
         wx.showToast({
-          title: '支付失败:' + aaa
+          title: '支付失败:' + (err.errMsg || ''),
+          icon: 'none'
         })
       },
       success: () => {
-        // 提示支付成功
         wx.showToast({
           title: '支付成功'
         })
@@ -164,11 +168,11 @@ Page({
       }
     })
   },
-  _toPayTap: function (orderId, money){
+  _toPayTap: function (orderId, orderNumber, money){
     const _this = this
     if (money <= 0) {
       // 直接使用余额支付
-      WXAPI.orderPay(wx.getStorageSync('token'), orderId).then(function (res) {
+      WXAPI.orderPay(wx.getStorageSync('token'), orderNumber).then(function (res) {
         _this.data.page = 1
         _this.orderList()
         _this.getOrderStatistics()
@@ -176,11 +180,13 @@ Page({
     } else {
       this.setData({
         orderId,
+        orderNumber,
         money,
         paymentShow: true,
         nextAction: {
           type: 0,
-          id: orderId
+          id: orderId,
+          orderNumber
         }
       })
     }
@@ -234,6 +240,13 @@ Page({
     wx.stopPullDownRefresh()
   },
   onReachBottom() {
+    if (this.data.page >= this.data.totalPage) {
+      wx.showToast({
+        title: '没有更多了',
+        icon: 'none'
+      })
+      return
+    }
     this.setData({
       page: this.data.page + 1
     });
@@ -257,20 +270,25 @@ Page({
     if (postData.status == 9999) {
       postData.status = ''
     }
+    console.log('[订单列表] 请求参数:', postData)
     const res = await WXAPI.orderList(postData)
     wx.hideLoading()
+    console.log('[订单列表] 返回数据:', res)
     if (res.code == 0) {
+      const totalPage = res.data.totalPage || res.data.total_page || 1
       if (this.data.page == 1) {
         this.setData({
           orderList: res.data.orderList,
           logisticsMap: res.data.logisticsMap,
-          goodsMap: res.data.goodsMap
+          goodsMap: res.data.goodsMap,
+          totalPage
         })
       } else {
         this.setData({
           orderList: this.data.orderList.concat(res.data.orderList),
           logisticsMap: Object.assign(this.data.logisticsMap, res.data.logisticsMap),
-          goodsMap: Object.assign(this.data.goodsMap, res.data.goodsMap)
+          goodsMap: Object.assign(this.data.goodsMap, res.data.goodsMap),
+          totalPage
         })
       }
     } else {

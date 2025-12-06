@@ -1,69 +1,37 @@
 {
   "pages": [
     "pages/start/start",
-    "pages/test/wifi",
-    "pages/shop/select",
     "pages/index/index",
+    "pages/farm/index",
+    "pages/shop-cart/index",
+    "pages/my/index",
     "pages/notice/index",
     "pages/notice/show",
-    "pages/category/category",
     "pages/goods/list",
-    "pages/goods/list-vop",
     "pages/goods/fav",
     "pages/goods/his",
     "pages/goods-details/index",
-    "pages/goods-details/vop",
-    "pages/goods-details/day",
-    "pages/goods-details/times01",
-    "pages/goods-details/times02",
-    "pages/shop-cart/index",
+    "pages/search/index",
     "pages/to-pay-order/index",
     "pages/select-address/index",
     "pages/address-add/index",
     "pages/order-list/index",
     "pages/order-details/index",
-    "pages/order-details/scan-result",
     "pages/order/refundApply",
     "pages/wuliu/index",
-    "pages/my/index",
-    "pages/withdraw/index",
-    "pages/score-excharge/index",
-    "pages/score-excharge/growth",
     "pages/asset/index",
     "pages/recharge/index",
-    "pages/score/index",
-    "pages/score/growth",
-    "pages/sign/index",
-    "pages/maidan/index",
     "pages/coupons/index",
     "pages/coupons/merge",
-    "pages/invoice/list",
-    "pages/invoice/apply",
-    "pages/deposit/pay",
-    "pages/live/index",
     "pages/help/detail",
     "pages/help/index",
     "pages/cms/list",
     "pages/about/index",
-    "pages/idCheck/index",
-    "pages/peisong/detail",
-    "pages/peisong/orders",
-    "pages/peisong/statistics",
-    "pages/pwd-pay/reset",
-    "pages/pwd-pay/modify",
-    "pages/pwd-pay/set",
     "pages/my/feedback",
-    "pages/search/index",
     "pages/my/info",
     "pages/my/setting",
     "pages/my/info-menu",
-    "pages/recycle/index",
-    "pages/recycle/orders",
-    "pages/recycle/order-detail",
-    "pages/card/logs",
-    "pages/notagree/index",
     "pages/my/user-code",
-    "pages/raffle/index",
     "pages/login/index"
   ],
   "requiredPrivateInfos": [
@@ -71,45 +39,7 @@
     "chooseAddress",
     "chooseLocation"
   ],
-  "subpackages": [
-    {
-      "root": "packageStreamMedia",
-      "name": "packageStreamMedia",
-      "pages": [
-        "pages/videoCall/videoCall",
-        "pages/live-anchor/index",
-        "pages/live-anchor/list",
-        "pages/live-client/list",
-        "pages/live-client/client"
-      ]
-    },
-    {
-      "root": "packageCps",
-      "name": "packageCps",
-      "pages": [
-        "pages/goods-details/cps-jd",
-        "pages/goods-details/cps-pdd",
-        "pages/goods-details/cps-taobao",
-        "pages/order-list/cps"
-      ]
-    },
-    {
-      "root": "packageFx",
-      "name": "packageFx",
-      "pages": [
-        "pages/index/index",
-        "pages/hehuorenfenxiao/index",
-        "pages/hehuorenfenxiao/fxmember",
-        "pages/apply/index",
-        "pages/apply/form",
-        "pages/myusers/index",
-        "pages/commisionLog/index",
-        "pages/report/team",
-        "pages/report/city",
-        "pages/myusers/myusers-detail"
-      ]
-    }
-  ],
+  "subpackages": [],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
@@ -119,7 +49,7 @@
   },
   "tabBar": {
     "color": "#6e6d6b",
-    "selectedColor": "#e64340",
+    "selectedColor": "#07c160",
     "borderStyle": "white",
     "backgroundColor": "#fff",
     "list": [
@@ -130,16 +60,10 @@
         "text": "首页"
       },
       {
-        "pagePath": "pages/category/category",
-        "iconPath": "images/nav/fl-off.png",
-        "selectedIconPath": "images/nav/fl-on.png",
-        "text": "分类"
-      },
-      {
-        "pagePath": "pages/coupons/index",
-        "iconPath": "images/nav/coupon-off.png",
-        "selectedIconPath": "images/nav/coupon-on.png",
-        "text": "优惠券"
+        "pagePath": "pages/farm/index",
+        "iconPath": "images/nav/farm-off.png",
+        "selectedIconPath": "images/nav/farm-on.png",
+        "text": "农庄"
       },
       {
         "pagePath": "pages/shop-cart/index",

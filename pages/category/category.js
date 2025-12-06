@@ -1,5 +1,6 @@
-const WXAPI = require('apifm-wxapi')
-const AUTH = require('../../utils/auth')
+const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js') // TOOLS.showTabBarBadge();
 
 Page({

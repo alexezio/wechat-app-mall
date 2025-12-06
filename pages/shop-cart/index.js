@@ -1,6 +1,7 @@
-const WXAPI = require('apifm-wxapi')
+const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
 const TOOLS = require('../../utils/tools.js')
-const AUTH = require('../../utils/auth')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
 
 const app = getApp()
 
@@ -43,7 +44,7 @@ Page({
     this.shippingCarInfo()
   },
   async shippingCarInfo() {
-    const token = wx.getStorageSync('token')
+    const token = CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
     if (!token) {
       return
     }
@@ -124,7 +125,7 @@ Page({
     this.delItemDone(key)
   },
   async delItemDone(key) {
-    const token = wx.getStorageSync('token')
+    const token = CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
     if(this.data.shopCarType == 0){
       var res = await WXAPI.shippingCarInfoRemoveItem(token, key)
     }
@@ -145,7 +146,7 @@ Page({
     const index = e.currentTarget.dataset.index;
     const item = this.data.shippingCarInfo.items[index]
     const number = item.number + 1
-    const token = wx.getStorageSync('token')
+    const token = CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
     if(this.data.shopCarType == 0){
       var res = await WXAPI.shippingCarInfoModifyNumber(token, item.key, number)
     }
@@ -170,7 +171,7 @@ Page({
       })
       return
     }
-    const token = wx.getStorageSync('token')
+    const token = CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
     if(this.data.shopCarType == 0)
     {
       var res = await WXAPI.shippingCarInfoModifyNumber(token, item.key, number)  
@@ -184,7 +185,7 @@ Page({
   changeCarNumber(e) {
     const key = e.currentTarget.dataset.key
     const num = e.detail.value
-    const token = wx.getStorageSync('token')
+    const token = CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
     if(this.data.shopCarType == 0){
     WXAPI.shippingCarInfoModifyNumber(token, key, num).then(res => {
       this.shippingCarInfo()
@@ -198,7 +199,7 @@ Page({
   async radioClick(e) {
     var index = e.currentTarget.dataset.index;
     var item = this.data.shippingCarInfo.items[index]
-    const token = wx.getStorageSync('token')
+    const token = CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
     if (this.data.shopCarType == 0) { //自营购物车
       if (!item.stores || item.status == 1) {
         return
