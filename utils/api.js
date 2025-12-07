@@ -207,6 +207,37 @@ const FarmAPI = {
   },
 
   /**
+   * 获取监控设备列表
+   * @param {number} page
+   * @param {number} pageSize
+   */
+  getDevices(page = 0, pageSize = 50) {
+    return request(`/farm/devices?page=${page}&page_size=${pageSize}`, 'GET', {}, true)
+  },
+
+  /**
+   * 获取播放配置（包含 accessToken + url）
+   * @param {object} params
+   *  - device_serial: string
+   *  - channel_no?: number
+   *  - protocol?: number (1-ezopen 2-hls 3-rtmp 4-flv, 默认3)
+   *  - type?: number (1预览 2本地回放 3云回放，默认1)
+   *  - start_time?: string
+   *  - stop_time?: string
+   */
+  getPlayConfig(params = {}) {
+    const query = []
+    if (params.device_serial) query.push(`device_serial=${params.device_serial}`)
+    if (params.channel_no !== undefined) query.push(`channel_no=${params.channel_no}`)
+    if (params.protocol !== undefined) query.push(`protocol=${params.protocol}`)
+    if (params.type !== undefined) query.push(`type=${params.type}`)
+    if (params.start_time) query.push(`start_time=${encodeURIComponent(params.start_time)}`)
+    if (params.stop_time) query.push(`stop_time=${encodeURIComponent(params.stop_time)}`)
+    const qs = query.join('&')
+    return request(`/farm/live/play-config${qs ? '?' + qs : ''}`, 'GET', {}, true)
+  },
+
+  /**
    * 获取监控视频列表
    */
   getMonitors() {

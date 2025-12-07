@@ -42,6 +42,24 @@
           </view>
         </view>
 
+        <!-- 农庄位置 -->
+        <view class="intro-card">
+          <view class="card-title">
+            <text class="title-icon">📍</text>
+            <text>农庄位置</text>
+          </view>
+          <view class="intro-content location-row">
+            <view class="location-text">
+              <text class="location-name">{{farmName}}</text>
+              <text class="location-address">{{farmAddress}}</text>
+            </view>
+            <view class="location-btn" bindtap="openFarmLocation">
+              <van-icon name="location-o" size="36rpx" color="#07c160" />
+              <text class="location-btn-text">导航</text>
+            </view>
+          </view>
+        </view>
+
         <!-- 养殖特色 -->
         <view class="feature-section">
           <view class="card-title">
@@ -51,8 +69,8 @@
           <view class="feature-grid">
             <view class="feature-item">
               <view class="feature-icon">🏔️</view>
-              <view class="feature-name">山林散养</view>
-              <view class="feature-desc">500亩生态山林</view>
+              <view class="feature-name">农林散养</view>
+              <view class="feature-desc">30亩生态农林</view>
             </view>
             <view class="feature-item">
               <view class="feature-icon">🌾</view>
@@ -83,6 +101,60 @@
             <text class="title-text">养殖区监控</text>
           </view>
           <view class="header-desc">24小时实时监控</view>
+        </view>
+
+        <!-- 设备列表 -->
+        <view class="intro-card device-card" wx:if="{{devices.length > 0}}">
+          <view class="card-title">
+            <text class="title-icon">🎛️</text>
+            <text>设备列表</text>
+          </view>
+          <view class="device-list">
+            <view class="device-item" wx:for="{{devices}}" wx:key="{{item.device_serial}}-{{item.channel_no}}">
+              <view class="device-info">
+                <view class="device-name">{{item.name}}</view>
+                <view class="device-sub">
+                  <text>{{item.device_serial}} / 通道{{item.channel_no || 1}}</text>
+                  <text class="device-status {{item.status == 'online' ? 'online' : 'offline'}}">
+                    {{ item.status == 'online' ? '在线' : '离线' }}
+                  </text>
+                </view>
+              </view>
+              <view class="device-actions">
+                <button size="mini" type="primary" bindtap="loadLiveStream" data-serial="{{item.device_serial}}" data-channel="{{item.channel_no || 1}}">播放</button>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 农庄直播（按需加载） -->
+        <view class="live-card intro-card">
+          <view class="card-title">
+            <text class="title-icon">🔴</text>
+            <text>直播</text>
+          </view>
+          <view class="live-content">
+            <view wx:if="{{!liveConfig}}">
+              <button class="live-load-btn" size="mini" type="primary" loading="{{liveLoading}}" bindtap="loadLiveStream">
+                {{ liveLoading ? '加载中...' : '点击加载直播' }}
+              </button>
+            </view>
+            <view wx:else>
+              <ezplayer
+                id="ezplayer"
+                accessToken="{{liveConfig.accessToken}}"
+                url="{{liveConfig.url}}"
+                plugins="{{liveConfig.plugins}}"
+                ratio="{{liveConfig.ratio}}"
+                width="{{liveConfig.width}}"
+                height="{{liveConfig.height}}"
+                recPlayTime="{{liveConfig.recPlayTime}}"
+                theme="{{liveConfig.theme}}"
+                bind:handleError="handleLiveError"
+                bind:onControlEvent="handleLiveControl"
+              />
+            </view>
+          </view>
         </view>
 
         <!-- 环境数据 -->
@@ -126,21 +198,21 @@
         <view class="process-card">
           <view class="card-title">
             <text class="title-icon">📖</text>
-            <text>养殖日记</text>
+            <text>养殖流程</text>
           </view>
           <view class="process-timeline">
             <view class="timeline-item">
               <view class="timeline-dot"></view>
               <view class="timeline-content">
                 <view class="timeline-title">鸡苗入场</view>
-                <view class="timeline-desc">选用优质鸡苗，确保基因健康</view>
+                <view class="timeline-desc">选用优质江汉鸡苗，确保基因健康</view>
               </view>
             </view>
             <view class="timeline-item">
               <view class="timeline-dot"></view>
               <view class="timeline-content">
                 <view class="timeline-title">散养阶段</view>
-                <view class="timeline-desc">山林自由觅食，增强体质</view>
+                <view class="timeline-desc">农林自由觅食，增强体质</view>
               </view>
             </view>
             <view class="timeline-item">
@@ -208,7 +280,7 @@
           </view>
         </view>
 
-        <!-- 认证资质 -->
+        <!-- 
         <view class="cert-card">
           <view class="card-title">
             <text class="title-icon">🏆</text>
@@ -228,7 +300,7 @@
               <text class="cert-name">ISO认证</text>
             </view>
           </view>
-        </view>
+        </view> 认证资质 -->
       </view>
     </van-tab>
 

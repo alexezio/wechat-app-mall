@@ -1204,6 +1204,25 @@ const WXAPIAdapter = {
     return { code: 700, data: null }
   },
 
+  // ========== 农场直播/监控 ==========
+  async farmDevices(params = {}) {
+    try {
+      const page = params.page || 0
+      const pageSize = params.pageSize || 50
+      return await FarmAPI.getDevices(page, pageSize)
+    } catch (error) {
+      return { code: -1, msg: error.message || error.msg }
+    }
+  },
+
+  async farmPlayConfig(params = {}) {
+    try {
+      return await FarmAPI.getPlayConfig(params)
+    } catch (error) {
+      return { code: -1, msg: error.message || error.msg }
+    }
+  },
+
   /**
    * 获取默认收货地址
    */

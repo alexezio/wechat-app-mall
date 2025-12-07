@@ -39,6 +39,12 @@
     "chooseAddress",
     "chooseLocation"
   ],
+  "plugins": {
+    "ezplayer": {
+      "version": "latest",
+      "provider": "wxf2b3a0262975d8c2"
+    }
+  },
   "subpackages": [],
   "window": {
     "backgroundTextStyle": "light",
