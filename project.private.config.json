@@ -2,7 +2,7 @@
   "setting": {
     "compileHotReLoad": true,
     "urlCheck": false,
-    "bigPackageSizeSupport": false,
+    "bigPackageSizeSupport": true,
     "coverView": true,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": false,

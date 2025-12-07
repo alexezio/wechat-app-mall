@@ -88,12 +88,14 @@ Page({
         channel_no: channelNo
       })
       console.log('[农庄] live-stream 返回:', res)
-      if (res.code === 0 && res.data && (res.data.accessToken || res.data.access_token) && res.data.url) {
+      if (res.code === 0 && res.data && (res.data.accessToken || res.data.access_token)) {
+        // 按插件要求拼接播放URL：rtmp://open.ys7.com/${deviceSerial}/${channelNo}/live
+        const playUrl = `rtmp://open.ys7.com/${deviceSerial}/${channelNo}/live`
         this.setData({
           selectedDevice: this.data.devices.find(d => d.device_serial === deviceSerial && d.channel_no === channelNo) || this.data.selectedDevice,
           liveConfig: {
             accessToken: res.data.accessToken || res.data.access_token,
-            url: res.data.url,
+            url: playUrl,
             plugins: res.data.plugins || 'voice,ptz',
             ratio: res.data.ratio || '16:9',
             width: res.data.width || '100%',

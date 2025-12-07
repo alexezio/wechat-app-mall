@@ -112,16 +112,23 @@
           <view class="device-list">
             <view class="device-item" wx:for="{{devices}}" wx:key="{{item.device_serial}}-{{item.channel_no}}">
               <view class="device-info">
-                <view class="device-name">{{item.name}}</view>
+                <view class="device-name">{{item.device_name}}</view>
                 <view class="device-sub">
-                  <text>{{item.device_serial}} / 通道{{item.channel_no || 1}}</text>
+                  <text>{{item.device_name}} / 通道{{item.channel_no || 1}}</text>
                   <text class="device-status {{item.status == 'online' ? 'online' : 'offline'}}">
                     {{ item.status == 'online' ? '在线' : '离线' }}
                   </text>
                 </view>
               </view>
               <view class="device-actions">
-                <button size="mini" type="primary" bindtap="loadLiveStream" data-serial="{{item.device_serial}}" data-channel="{{item.channel_no || 1}}">播放</button>
+                <button
+                  size="mini"
+                  type="{{item.status == 'online' ? 'primary' : 'default'}}"
+                  disabled="{{item.status != 'online'}}"
+                  bindtap="loadLiveStream"
+                  data-serial="{{item.device_serial}}"
+                  data-channel="{{item.channel_no || 1}}"
+                >{{ item.status == 'online' ? '播放' : '离线' }}</button>
               </view>
             </view>
           </view>
