@@ -166,6 +166,18 @@
   margin-top: 8rpx;
 }
 
+.live-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.live-entry button {
+  align-self: flex-start;
+  padding: 0 28rpx;
+  min-width: 180rpx;
+}
+
 /* 设备列表 */
 .device-card .device-list {
   display: flex;

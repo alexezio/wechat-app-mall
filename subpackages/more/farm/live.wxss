@@ -1,0 +1,43 @@
+.live-page {
+  padding: 20rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.title-icon {
+  margin-right: 12rpx;
+  font-size: 36rpx;
+}
+
+.live-content {
+  padding: 8rpx 0;
+}
+
+.live-load-btn {
+  margin-top: 8rpx;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 20rpx 0;
+}
+

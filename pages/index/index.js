@@ -55,7 +55,7 @@ Page({
     // 文章分类点击
     const category = this.data.cmsCategories[e.currentTarget.dataset.idx]
     wx.navigateTo({
-      url: '/pages/cms/list?categoryId=' + category.id,
+      url: '/subpackages/more/cms/list?categoryId=' + category.id,
     })
   },
   toDetailsTap: function(e) {
@@ -391,7 +391,7 @@ Page({
   },
   goCoupons: function (e) {
     wx.switchTab({
-      url: "/pages/coupons/index"
+      url: "/subpackages/more/coupons/index"
     })
   },
   pingtuanGoods(){ // 获取团购商品列表
@@ -415,7 +415,7 @@ Page({
   goNotice(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({
-      url: '/pages/notice/show?id=' + id,
+      url: '/subpackages/more/notice/show?id=' + id,
     })
   },
   async adPosition() {

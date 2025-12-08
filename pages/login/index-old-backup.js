@@ -16,7 +16,7 @@ Page({
   },
   goxieyi(e) {
     wx.navigateTo({
-      url: '/pages/about/index?key=' + e.currentTarget.dataset.key,
+      url: '/subpackages/more/about/index?key=' + e.currentTarget.dataset.key,
     })
   },
   showModal2() {

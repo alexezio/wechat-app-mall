@@ -87,7 +87,7 @@
     </van-field>
     <van-cell title="我的团队" value="查看" is-link url="../myusers/index" />
     <van-cell title="推广订单" value="查看" is-link url="../commisionLog/index" />
-    <van-cell title="账单明细" value="查看" is-link url="/pages/asset/index" />
+    <van-cell title="账单明细" value="查看" is-link url="/subpackages/more/asset/index" />
   </van-cell-group>
 
   <!-- 团队长、副队长 -->

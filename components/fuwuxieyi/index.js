@@ -60,7 +60,7 @@ Component({
     goYstk(e){
       const k = e.currentTarget.dataset.k
       wx.navigateTo({
-        url: '/pages/about/index?key=' + k,
+        url: '/subpackages/more/about/index?key=' + k,
       })
     },
     navBack: function () {

@@ -160,11 +160,11 @@
         <text class="function-icon">📷</text>
         <view class="function-label">扫码核销</view>
       </view>
-      <navigator url="/pages/asset/index" class="function-item">
+      <navigator url="/subpackages/more/asset/index" class="function-item">
         <text class="function-icon">📊</text>
         <view class="function-label">资金明细</view>
       </navigator>
-      <navigator url="/pages/coupons/index" class="function-item">
+      <navigator url="/subpackages/more/coupons/index" class="function-item">
         <text class="function-icon">🎫</text>
         <view class="function-label">优惠券</view>
       </navigator>
@@ -179,11 +179,11 @@
   <!-- 其他功能 -->
   <view class="other-section">
     <view class="section-title">其他功能</view>
-    <navigator url="/pages/my/info-menu" class="menu-item">
+    <navigator url="/subpackages/more/my/info-menu" class="menu-item">
       <view class="menu-label">个人信息</view>
       <text class="arrow">›</text>
     </navigator>
-    <navigator url="/pages/help/index" class="menu-item">
+    <navigator url="/subpackages/more/help/index" class="menu-item">
       <view class="menu-label">帮助中心</view>
       <text class="arrow">›</text>
     </navigator>
@@ -191,7 +191,7 @@
       <view class="menu-label">联系客服</view>
       <text class="arrow">›</text>
     </view>
-    <navigator url="/pages/my/setting" class="menu-item">
+    <navigator url="/subpackages/more/my/setting" class="menu-item">
       <view class="menu-label">系统设置</view>
       <text class="arrow">›</text>
     </navigator>

@@ -70,7 +70,7 @@ Page({
   wuliuDetailsTap: function (e) {
     var orderId = e.currentTarget.dataset.id;
     wx.navigateTo({
-      url: "/pages/wuliu/index?id=" + orderId
+      url: "/subpackages/more/wuliu/index?id=" + orderId
     })
   },
   async doneHx(){

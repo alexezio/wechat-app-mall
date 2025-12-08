@@ -59,7 +59,7 @@ Page({
       showCancel: false,
       success: (res) => {
         wx.redirectTo({
-          url: "/pages/asset/index"
+          url: "/subpackages/more/asset/index"
         })
       }
     })
@@ -70,7 +70,7 @@ Page({
       paymentShow: false
     })
     wx.redirectTo({
-      url: '/pages/asset/index',
+      url: '/subpackages/more/asset/index',
     })
   },
   paymentCancel() {

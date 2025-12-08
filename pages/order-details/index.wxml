@@ -60,7 +60,7 @@
           label="{{ item.tracesLast }}"
           center
           is-link
-          url="/pages/wuliu/index?id={{ item.orderId }}&trackingNumber={{ item.trackingNumber }}"
+          url="/subpackages/more/wuliu/index?id={{ item.orderId }}&trackingNumber={{ item.trackingNumber }}"
         />
       </view>
 

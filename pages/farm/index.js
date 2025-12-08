@@ -1,22 +1,19 @@
 // pages/farm/index.js
 const CONFIG = require('../../config')
 const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
-const AUTH = require('../../utils/auth')
+const AUTH = CONFIG.useNewApi ? require('../../utils/auth-new') : require('../../utils/auth')
 
 Page({
   data: {
     banners: [], // 农庄轮播图
-    videos: [], // 监控视频（可选，本期按设备列表+直播为主）
+    videos: [], // 监控视频（展示用）
     devices: [], // 监控设备列表
-    selectedDevice: null, // 当前选中的设备
     panoramaUrl: '', // 全景图地址
     farmIntro: '', // 农庄简介
     farmName: '连氏生态农庄',
     farmAddress: '湖北省监利市平强家庭农场',
     latitude: 29.641055,
     longitude: 112.963159,
-    liveConfig: null, // 直播配置
-    liveLoading: false,
     farmNews: [], // 农庄动态
     environmentData: {
       temperature: '--',
@@ -30,8 +27,8 @@ Page({
   onLoad: function (options) {
     this.getBanners()
     this.getFarmInfo()
-    this.getDevices()
     this.getFarmNews()
+    this.getDevices()
   },
 
   onShow: function () {
@@ -69,70 +66,6 @@ Page({
     })
   },
 
-  // 按需加载直播流（避免前端存储 accessToken）
-  async loadLiveStream(e) {
-    if (this.data.liveLoading) return
-    const dataset = e && e.currentTarget ? e.currentTarget.dataset : {}
-    const deviceSerial = dataset.serial || (this.data.selectedDevice && this.data.selectedDevice.device_serial)
-    const channelNo = dataset.channel || (this.data.selectedDevice && this.data.selectedDevice.channel_no) || 1
-    if (!deviceSerial) {
-      wx.showToast({ title: '未选择设备', icon: 'none' })
-      return
-    }
-
-    this.setData({ liveLoading: true })
-    try {
-      // 调用后端 play-config，获取 accessToken + url 等播放参数
-      const res = await WXAPI.farmPlayConfig({
-        device_serial: deviceSerial,
-        channel_no: channelNo
-      })
-      console.log('[农庄] live-stream 返回:', res)
-      if (res.code === 0 && res.data && (res.data.accessToken || res.data.access_token)) {
-        // 按插件要求拼接播放URL：rtmp://open.ys7.com/${deviceSerial}/${channelNo}/live
-        const playUrl = `rtmp://open.ys7.com/${deviceSerial}/${channelNo}/live`
-        this.setData({
-          selectedDevice: this.data.devices.find(d => d.device_serial === deviceSerial && d.channel_no === channelNo) || this.data.selectedDevice,
-          liveConfig: {
-            accessToken: res.data.accessToken || res.data.access_token,
-            url: playUrl,
-            plugins: res.data.plugins || 'voice,ptz',
-            ratio: res.data.ratio || '16:9',
-            width: res.data.width || '100%',
-            height: res.data.height || '240px',
-            theme: res.data.theme || { showCapture: true, showBottomBar: true, showDatePicker: true, showTypeSwitch: true },
-            recPlayTime: res.data.recPlayTime || ''
-          }
-        })
-      } else {
-        wx.showToast({
-          title: res.msg || '获取播放参数失败',
-          icon: 'none'
-        })
-      }
-    } catch (error) {
-      console.error('[农庄] 获取直播参数异常:', error)
-      wx.showToast({
-        title: '获取直播参数失败',
-        icon: 'none'
-      })
-    } finally {
-      this.setData({ liveLoading: false })
-    }
-  },
-
-  handleLiveError(e) {
-    console.error('[农庄] 直播错误:', e.detail || e)
-    wx.showToast({
-      title: (e.detail && e.detail.msg) ? e.detail.msg : '直播播放出错',
-      icon: 'none'
-    })
-  },
-
-  handleLiveControl(e) {
-    console.log('[农庄] 直播控制事件:', e.detail)
-  },
-
   // 查看农庄位置 / 导航
   openFarmLocation() {
     const latitude = Number(this.data.latitude)
@@ -151,32 +84,6 @@ Page({
       address: this.data.farmAddress || '',
       scale: 16
     })
-  },
-
-  // 获取设备列表
-  async getDevices() {
-    try {
-      const res = await WXAPI.farmDevices()
-      console.log('[农庄] devices 返回:', res)
-      if (res.code === 0 && Array.isArray(res.data)) {
-        this.setData({ devices: res.data })
-        // 默认选择第一个设备但不自动拉流，等待用户点击以节省流量
-        if (res.data.length > 0) {
-          this.setData({ selectedDevice: res.data[0] })
-        }
-      } else {
-        wx.showToast({
-          title: res.msg || '获取设备失败',
-          icon: 'none'
-        })
-      }
-    } catch (e) {
-      console.error('[农庄] 获取设备异常:', e)
-      wx.showToast({
-        title: '获取设备失败',
-        icon: 'none'
-      })
-    }
   },
 
   // 获取环境数据
@@ -220,6 +127,13 @@ Page({
     })
   },
 
+  // 跳转分包实时监控
+  goLive() {
+    wx.navigateTo({
+      url: '/subpackages/more/farm/live'
+    })
+  },
+
   // 显示全景
   showPanorama() {
     this.setData({
@@ -232,6 +146,79 @@ Page({
     this.setData({
       showPanorama: false
     })
+  },
+
+  // 跳转分包实时监控（不带设备）
+  goLive() {
+    wx.navigateTo({
+      url: '/subpackages/more/farm/live'
+    })
+  },
+
+  // 跳转分包实时监控（携带设备信息）
+  async goLiveWithDevice(e) {
+    const serial = e.currentTarget.dataset.serial
+    const channel = e.currentTarget.dataset.channel || 1
+    if (!serial) return
+    wx.showLoading({ title: '加载中', mask: true })
+    try {
+      const res = await WXAPI.farmPlayConfig({
+        device_serial: serial,
+        channel_no: channel
+      })
+      console.log('[农庄] play-config:', res)
+      if (res.code === 0 && res.data && (res.data.accessToken || res.data.access_token)) {
+        const playUrl = `rtmp://open.ys7.com/${serial}/${channel}/live`
+        const liveConfig = {
+          accessToken: res.data.accessToken || res.data.access_token,
+          url: playUrl,
+          plugins: res.data.plugins || 'voice,ptz',
+          ratio: res.data.ratio || '16:9',
+          width: res.data.width || '100%',
+          height: res.data.height || '240px',
+          theme: res.data.theme || { showCapture: true, showBottomBar: true, showDatePicker: true, showTypeSwitch: true },
+          recPlayTime: res.data.recPlayTime || ''
+        }
+        wx.navigateTo({
+          url: '/subpackages/more/farm/live',
+          success(nav) {
+            nav.eventChannel.emit('liveConfig', {
+              liveConfig,
+              device: { device_serial: serial, channel_no: channel }
+            })
+          }
+        })
+      } else {
+        wx.showToast({ title: res.msg || '获取播放参数失败', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('[农庄] 拉流异常:', err)
+      wx.showToast({ title: '获取播放参数失败', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  // 获取设备列表
+  async getDevices() {
+    try {
+      const res = await WXAPI.farmDevices()
+      console.log('[农庄] devices 返回:', res)
+      if (res.code === 0 && Array.isArray(res.data)) {
+        this.setData({ devices: res.data })
+      } else {
+        wx.showToast({
+          title: res.msg || '获取设备失败',
+          icon: 'none'
+        })
+      }
+    } catch (e) {
+      console.error('[农庄] 获取设备异常:', e)
+      wx.showToast({
+        title: '获取设备失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 播放监控视频

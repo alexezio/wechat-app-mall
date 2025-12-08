@@ -132,7 +132,7 @@ Page({
   },
   goAsset: function () {
     wx.navigateTo({
-      url: "/pages/asset/index"
+      url: "/subpackages/more/asset/index"
     })
   },
   goScore: function () {
@@ -246,7 +246,7 @@ Page({
   },
   goUserCode() {
     wx.navigateTo({
-      url: '/pages/my/user-code',
+      url: '/subpackages/more/my/user-code',
     })
   },
   customerService() {

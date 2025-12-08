@@ -1,0 +1,29 @@
+<view class="live-page">
+    <view class="card-title">
+      <text class="title-icon">🔴</text>
+      <text>直播</text>
+    </view>
+    <view class="live-content">
+      <view wx:if="{{!liveConfig}}">
+        <button class="live-load-btn" size="mini" type="primary" loading="{{liveLoading}}">
+          {{ liveLoading ? '加载中...' : '缺少播放参数' }}
+        </button>
+      </view>
+      <view wx:else>
+        <ezplayer
+          id="ezplayer"
+          accessToken="{{liveConfig.accessToken}}"
+          url="{{liveConfig.url}}"
+          plugins="{{liveConfig.plugins}}"
+          ratio="{{liveConfig.ratio}}"
+          width="{{liveConfig.width}}"
+          height="{{liveConfig.height}}"
+          recPlayTime="{{liveConfig.recPlayTime}}"
+          theme="{{liveConfig.theme}}"
+          bind:handleError="handleLiveError"
+          bind:onControlEvent="handleLiveControl"
+        />
+      </view>
+    </view>
+</view>
+

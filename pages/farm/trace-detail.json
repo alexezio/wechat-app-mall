@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "产品溯源",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "van-icon": "@vant/weapp/icon/index"
-  }
-}
-

@@ -10,6 +10,7 @@ module.exports = {
   
   // ==================== 新增：后端API配置 ====================
   apiBaseUrl: 'https://api1.xiaofamoyu.com', // 后端API地址，请修改为你的实际地址
+  // apiBaseUrl: 'http://localhost:8000',
   useNewApi: true, // 是否使用新的API（true使用新API，false使用旧的apifm-wxapi）
   bigPackageSizeSupport: true
 }

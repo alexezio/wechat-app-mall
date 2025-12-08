@@ -264,7 +264,7 @@ Page({
 
   recharge: function (e) {
     wx.navigateTo({
-      url: "/pages/recharge/index"
+      url: "/subpackages/more/recharge/index"
     })
   },
   withdraw: function (e) {

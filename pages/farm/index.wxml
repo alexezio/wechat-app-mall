@@ -100,10 +100,9 @@
             <text class="title-icon">📹</text>
             <text class="title-text">养殖区监控</text>
           </view>
-          <view class="header-desc">24小时实时监控</view>
+          <view class="header-desc">点击进入实时监控</view>
         </view>
 
-        <!-- 设备列表 -->
         <view class="intro-card device-card" wx:if="{{devices.length > 0}}">
           <view class="card-title">
             <text class="title-icon">🎛️</text>
@@ -115,9 +114,6 @@
                 <view class="device-name">{{item.device_name}}</view>
                 <view class="device-sub">
                   <text>{{item.device_name}} / 通道{{item.channel_no || 1}}</text>
-                  <text class="device-status {{item.status == 'online' ? 'online' : 'offline'}}">
-                    {{ item.status == 'online' ? '在线' : '离线' }}
-                  </text>
                 </view>
               </view>
               <view class="device-actions">
@@ -125,41 +121,11 @@
                   size="mini"
                   type="{{item.status == 'online' ? 'primary' : 'default'}}"
                   disabled="{{item.status != 'online'}}"
-                  bindtap="loadLiveStream"
+                  bindtap="goLiveWithDevice"
                   data-serial="{{item.device_serial}}"
                   data-channel="{{item.channel_no || 1}}"
                 >{{ item.status == 'online' ? '播放' : '离线' }}</button>
               </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- 农庄直播（按需加载） -->
-        <view class="live-card intro-card">
-          <view class="card-title">
-            <text class="title-icon">🔴</text>
-            <text>直播</text>
-          </view>
-          <view class="live-content">
-            <view wx:if="{{!liveConfig}}">
-              <button class="live-load-btn" size="mini" type="primary" loading="{{liveLoading}}" bindtap="loadLiveStream">
-                {{ liveLoading ? '加载中...' : '点击加载直播' }}
-              </button>
-            </view>
-            <view wx:else>
-              <ezplayer
-                id="ezplayer"
-                accessToken="{{liveConfig.accessToken}}"
-                url="{{liveConfig.url}}"
-                plugins="{{liveConfig.plugins}}"
-                ratio="{{liveConfig.ratio}}"
-                width="{{liveConfig.width}}"
-                height="{{liveConfig.height}}"
-                recPlayTime="{{liveConfig.recPlayTime}}"
-                theme="{{liveConfig.theme}}"
-                bind:handleError="handleLiveError"
-                bind:onControlEvent="handleLiveControl"
-              />
             </view>
           </view>
         </view>

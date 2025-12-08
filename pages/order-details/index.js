@@ -38,14 +38,14 @@ Page({
       const nextAction = res.data[0].nextAction
       if(!nextAction) {
         wx.navigateTo({
-          url: '/pages/asset/index',
+          url: '/subpackages/more/asset/index',
         })
         return
       }
       const _nextAction = JSON.parse(nextAction)
       if (_nextAction.type != 0) {
         wx.navigateTo({
-          url: '/pages/asset/index',
+          url: '/subpackages/more/asset/index',
         })
         return
       }
@@ -110,7 +110,7 @@ Page({
     wuliuDetailsTap:function(e){
       var orderId = e.currentTarget.dataset.id;
       wx.navigateTo({
-        url: "/pages/wuliu/index?id=" + orderId
+        url: "/subpackages/more/wuliu/index?id=" + orderId
       })
     },
     confirmBtnTap:function(e){

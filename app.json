@@ -4,9 +4,6 @@
     "pages/index/index",
     "pages/farm/index",
     "pages/shop-cart/index",
-    "pages/my/index",
-    "pages/notice/index",
-    "pages/notice/show",
     "pages/goods/list",
     "pages/goods/fav",
     "pages/goods/his",
@@ -18,20 +15,7 @@
     "pages/order-list/index",
     "pages/order-details/index",
     "pages/order/refundApply",
-    "pages/wuliu/index",
-    "pages/asset/index",
-    "pages/recharge/index",
-    "pages/coupons/index",
-    "pages/coupons/merge",
-    "pages/help/detail",
-    "pages/help/index",
-    "pages/cms/list",
-    "pages/about/index",
-    "pages/my/feedback",
-    "pages/my/info",
-    "pages/my/setting",
-    "pages/my/info-menu",
-    "pages/my/user-code",
+    "pages/my/index",
     "pages/login/index"
   ],
   "requiredPrivateInfos": [
@@ -39,13 +23,37 @@
     "chooseAddress",
     "chooseLocation"
   ],
-  "plugins": {
-    "ezplayer": {
-      "version": "latest",
-      "provider": "wxf2b3a0262975d8c2"
+  "subpackages": [
+    {
+      "root": "subpackages/more",
+      "pages": [
+        "wuliu/index",
+        "asset/index",
+        "recharge/index",
+        "coupons/index",
+        "coupons/merge",
+        "help/detail",
+        "help/index",
+        "cms/list",
+        "about/index",
+        "my/feedback",
+        "my/info",
+        "my/setting",
+        "my/info-menu",
+        "my/user-code",
+        "notice/index",
+        "notice/show",
+        "maidan/index",
+        "farm/live"
+      ],
+      "plugins": {
+        "ezplayer": {
+          "version": "latest",
+          "provider": "wxf2b3a0262975d8c2"
+        }
+      }
     }
-  },
-  "subpackages": [],
+  ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
