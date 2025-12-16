@@ -367,6 +367,42 @@ const WXAPIAdapter = {
   },
 
   /**
+   * 订单详情（通过订单号/序列号）
+   */
+  async orderDetail(orderSn) {
+    try {
+      const res = await OrderAPI.getDetail(orderSn)
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message || error.msg }
+    }
+  },
+
+  /**
+   * 取消订单
+   */
+  async orderClose(token, orderSn) {
+    try {
+      const res = await OrderAPI.cancel(orderSn)
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message || error.msg }
+    }
+  },
+
+  /**
+   * 确认收货
+   */
+  async orderConfirm(token, orderSn) {
+    try {
+      const res = await OrderAPI.confirm(orderSn)
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message || error.msg }
+    }
+  },
+
+  /**
    * 购物车相关
    */
   async shippingCarInfo(token) {
@@ -764,20 +800,56 @@ const WXAPIAdapter = {
    * 发起支付，返回支付参数
    * @param {string} token
    * @param {string} orderNumber 订单号（order_number）
-   * @param {object} extra 可选 { pay_type, use_balance }
+   * @param {object} extra 可选 { pay_type, payType, use_balance }
    */
   async orderPay(token, orderNumber, extra = {}) {
     try {
       if (!orderNumber) {
         return { code: -1, msg: '缺少订单号' }
       }
+      // 根据支付方式传递 payType，默认余额支付
+      const payType = extra.payType || extra.pay_type || 'balance'
       const res = await OrderAPI.pay({
         order_number: orderNumber,
+        pay_type: payType,
         ...extra
       })
       return res
     } catch (error) {
       return { code: -1, msg: error.message || error.msg || '支付失败' }
+    }
+  },
+
+  /**
+   * 提交订单评价
+   * @param {object} params - { postJsonString: JSON.stringify({ token, orderId, reputations }) }
+   */
+  async orderReputation(params) {
+    try {
+      if (!params || !params.postJsonString) {
+        return { code: -1, msg: '缺少评价参数' }
+      }
+      const data = JSON.parse(params.postJsonString)
+      if (!data.orderId || !data.reputations || !Array.isArray(data.reputations)) {
+        return { code: -1, msg: '评价参数格式错误' }
+      }
+      
+      // 转换为后端需要的格式
+      const requestData = {
+        order_id: data.orderId,
+        reputations: data.reputations.map(r => ({
+          order_goods_id: r.id,
+          reputation: r.reputation,
+          reputation_score: r.reputationNumber || r.reputation,
+          remark: r.remark || '',
+          pics: r.pics || []
+        }))
+      }
+      
+      const res = await OrderAPI.submitReputation(requestData)
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message || error.msg || '提交评价失败' }
     }
   },
 
@@ -1153,14 +1225,51 @@ const WXAPIAdapter = {
   },
 
   async goodsReputationV2(params) {
-    // 商品评价
-    return {
-      code: 0,
-      data: {
-        goodReputation: 100,
-        totalreputation: 0,
-        reputation: []
+    try {
+      const goodsId = params.goodsId
+      if (!goodsId) {
+        return { code: -1, msg: '缺少商品ID' }
       }
+      
+      const page = params.page || 1
+      const pageSize = params.pageSize || 10
+      
+      const res = await GoodsAPI.getReputations(goodsId, page, pageSize)
+      
+      if (res.code === 0 && res.data) {
+        // 转换为前端需要的格式
+        const result = (res.data.result || []).map(item => ({
+          id: item.id,
+          user: {
+            id: item.user_id,
+            nick: item.user_nick || item.user_name || `用户${item.user_id}`,
+            avatarUrl: item.user_avatar || ''
+          },
+          goods: {
+            goodReputation: item.reputation,
+            goodReputationRemark: item.remark || '',
+            dateReputation: item.created_at || item.date_add,
+            goodReputationReply: item.reply || ''
+          },
+          reputationPics: (item.pics || []).map(pic => ({
+            pic: pic
+          }))
+        }))
+        
+        return {
+          code: 0,
+          data: {
+            result,
+            goodReputation: res.data.good_reputation_rate || 100,
+            totalreputation: res.data.total || result.length
+          }
+        }
+      }
+      
+      return res
+    } catch (error) {
+      console.error('[适配器] 获取商品评价错误:', error)
+      return { code: -1, msg: error.message || error.msg || '获取评价失败' }
     }
   },
 

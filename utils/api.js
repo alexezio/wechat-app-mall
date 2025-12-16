@@ -185,6 +185,16 @@ const GoodsAPI = {
    */
   getDetail(goodsId) {
     return request(`/goods/detail/${goodsId}`, 'GET')
+  },
+
+  /**
+   * 获取商品评价列表
+   * @param {number} goodsId - 商品ID
+   * @param {number} page - 页码
+   * @param {number} pageSize - 每页数量
+   */
+  getReputations(goodsId, page = 1, pageSize = 10) {
+    return request(`/goods/${goodsId}/reputations?page=${page}&page_size=${pageSize}`, 'GET')
   }
 }
 
@@ -452,6 +462,39 @@ const OrderAPI = {
    */
   pay(data) {
     return request('/order/pay', 'POST', data, true)
+  },
+
+  /**
+   * 获取订单详情（通过订单号/序列号）
+   * @param {string} orderSn - 订单号
+   */
+  getDetail(orderSn) {
+    return request(`/order/detail/${orderSn}`, 'GET', {}, true)
+  },
+
+  /**
+   * 取消订单（通过订单号/序列号）
+   * @param {string} orderSn - 订单号
+   */
+  cancel(orderSn) {
+    return request(`/order/${orderSn}/cancel`, 'POST', {}, true)
+  },
+
+  /**
+   * 确认收货
+   * @param {string} orderSn - 订单号
+   */
+  confirm(orderSn) {
+    return request(`/order/${orderSn}/confirm`, 'POST', { order_number: orderSn }, true)
+  },
+
+  /**
+   * 提交订单评价
+   * @param {object} data - 评价数据
+   * @returns {Promise}
+   */
+  submitReputation(data) {
+    return request('/order/reputation', 'POST', data, true)
   }
 }
 

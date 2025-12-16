@@ -669,7 +669,7 @@ Page({
           success: res2 => {
             if (res2.confirm) {
               // 使用余额支付
-              WXAPI.orderPay(getToken(), orderNumber || orderId).then(res3 => {
+              WXAPI.orderPay(getToken(), orderNumber || orderId, { payType: 'balance' }).then(res3 => {
                 if (res3.code != 0) {
                   wx.showToast({
                     title: res3.msg,

@@ -1,8 +1,14 @@
-const WXAPI = require('apifm-wxapi')
+const CONFIG = require('../../config.js')
+const WXAPI = CONFIG.useNewApi ? require('../../utils/wxapi-adapter') : require('apifm-wxapi')
+
+function getToken() {
+  return CONFIG.useNewApi ? wx.getStorageSync('jwt_token') : wx.getStorageSync('token')
+}
 
 Page({
     data:{
       orderId:0,
+      orderSn:'',
       goodsList:[]
     },
     onLoad:function(e){
@@ -10,6 +16,7 @@ Page({
       // e.payOrderNo = 'ZF2408290780106421'
       this.setData({
         orderId: e.id,
+        orderSn: e.order_number || e.orderSn || e.id || '',
         payOrderNo: e.payOrderNo,
       })
       if (e.payOrderNo) {
@@ -61,7 +68,12 @@ Page({
       wx.showLoading({
         title: '',
       })
-      const res = await WXAPI.orderDetail(wx.getStorageSync('token'), this.data.orderId)
+      let res
+      if (CONFIG.useNewApi) {
+        res = await WXAPI.orderDetail(this.data.orderSn || this.data.orderId)
+      } else {
+        res = await WXAPI.orderDetail(getToken(), this.data.orderId)
+      }
       wx.hideLoading()
       if (res.code != 0) {
         wx.showModal({
@@ -70,13 +82,91 @@ Page({
         })
         return
       }
+      // 适配新接口结构
+      let detail = res.data
+      if (CONFIG.useNewApi && res.data) {
+        const d = res.data
+        const oi = d.order_info || {}
+        const orderInfo = {
+          id: oi.id,
+          orderNumber: oi.order_number,
+          status: oi.status,
+          statusStr: oi.status_str || '',
+          amountReal: oi.amount_real,
+          amountGoods: oi.amount_goods,
+          amountLogistics: oi.freight,
+          amountGoods: oi.amount_goods,
+          freight: oi.freight,
+          couponAmount: oi.coupon_amount,
+          deductionMoney: oi.deduction_money,
+          score: oi.score || 0,
+          remark: oi.remark || '',
+          peisongType: oi.peisong_type,
+          dateAdd: oi.date_add,
+          datePay: oi.date_pay,
+          dateSend: oi.date_send,
+          dateConfirm: oi.date_confirm,
+          hxNumber: oi.hx_number,
+          linkMan: oi.link_man,
+          mobile: oi.mobile,
+          address: oi.address,
+          provinceName: oi.province_name,
+          cityName: oi.city_name,
+          districtName: oi.district_name,
+          streetName: oi.street_name,
+          logisticsCompany: oi.logistics_company,
+          logisticsNumber: oi.logistics_number
+        }
+        const goods = (d.goods || []).map(g => ({
+          id: g.id,
+          goods_id: g.goods_id,
+          goodsId: g.goods_id,
+          goods_name: g.goods_name,
+          goodsName: g.goods_name,
+          pic: g.pic,
+          property: g.property,
+          price: g.price,
+          number: g.number,
+          amount: g.amount,
+          after_sale_status: g.after_sale_status,
+          can_refund: g.can_refund
+        }))
+        const logistics = (oi.link_man || oi.address || oi.logistics_number) ? {
+          trackingNumber: oi.logistics_number,
+          linkMan: oi.link_man,
+          mobile: oi.mobile,
+          provinceStr: oi.province_name,
+          cityStr: oi.city_name,
+          areaStr: oi.district_name || oi.street_name,
+          address: oi.address
+        } : null
+        const logs = (d.logs || []).map(log => ({
+          typeStr: log.msg || log.type,
+          dateAdd: log.date
+        }))
+        detail = {
+          orderInfo,
+          goods,
+          logs,
+          orderLogisticsShippers: [],
+          logistics,
+          logisticsTraces: null,
+          extJson: d.ext_json || {}
+        }
+        // 同步内部使用的 orderId
+        this.setData({
+          orderId: oi.id,
+          orderSn: oi.order_number
+        })
+      }
+
       // 绘制核销码
-      if (res.data.orderInfo.hxNumber && res.data.orderInfo.status > 0 && res.data.orderInfo.status < 3) {
-        this.wxaQrcode(res.data.orderInfo.hxNumber)
+      if (detail.orderInfo && detail.orderInfo.hxNumber && detail.orderInfo.status > 0 && detail.orderInfo.status < 3) {
+        this.wxaQrcode(detail.orderInfo.hxNumber)
       }
       // 子快递单信息
-      if (res.data.orderLogisticsShippers) {
-        res.data.orderLogisticsShippers.forEach(ele => {
+      if (detail.orderLogisticsShippers) {
+        detail.orderLogisticsShippers.forEach(ele => {
           if (ele.traces) {
             ele.tracesArray = JSON.parse (ele.traces)
             if (ele.tracesArray && ele.tracesArray.length > 0) {
@@ -86,7 +176,7 @@ Page({
         })
       }
       let iotControl = false
-      res.data.goods.forEach(ele => {
+      ;(detail.goods || []).forEach(ele => {
         if (ele.iotControl) {
           iotControl = true
         }
@@ -96,14 +186,20 @@ Page({
         this._shopIotDevices()
       }
       let orderStores = null
-      if (res.data.orderStores) {
-        orderStores = res.data.orderStores.filter(ele => ele.type == 2)
+      if (detail.orderStores) {
+        orderStores = detail.orderStores.filter(ele => ele.type == 2)
       }
-      if (!res.data.extJson || Object.keys(res.data.extJson).length == 0) {
-        delete res.data.extJson
+      if (!detail.extJson || Object.keys(detail.extJson).length == 0) {
+        delete detail.extJson
+      }
+      if (!detail.logs || detail.logs.length === 0) {
+        delete detail.logs
+      }
+      if (!detail.orderLogisticsShippers || detail.orderLogisticsShippers.length === 0) {
+        delete detail.orderLogisticsShippers
       }
       this.setData({
-        orderDetail: res.data,
+        orderDetail: detail,
         orderStores
       })
     },

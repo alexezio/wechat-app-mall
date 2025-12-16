@@ -80,7 +80,7 @@ Component({
       }
 
       // 调用新后端支付接口
-      const res = await WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { pay_type: 'wxpay' })
+      const res = await WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { pay_type: 'wxpay', payType: 'wxpay' })
       if (res.code != 0 || !res.data) {
         wx.showModal({
           content: res.msg || '获取支付参数失败',

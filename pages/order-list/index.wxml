@@ -106,9 +106,11 @@
 
         <!-- 操作按钮 -->
         <view class="order-actions">
-          <view class="action-btn btn-default" hidden="{{item.status==0? false : true}}" catch:tap="cancelOrderTap" data-id="{{item.id}}">取消订单</view>
+          <view class="action-btn btn-default" hidden="{{item.status==0? false : true}}" catch:tap="cancelOrderTap" data-id="{{item.id}}"  data-order-number="{{item.orderNumber}}">取消订单</view>
           <view class="action-btn btn-primary" hidden="{{item.status==0? false : true}}" catch:tap="toPayTap" data-id="{{item.id}}" data-order-number="{{item.orderNumber}}" data-money="{{item.amountReal}}" data-score="{{item.score}}">立即付款</view>
           <view wx:if="{{ item.status == 0 && sphpay_open == '1' }}" class="action-btn btn-primary" catch:tap="wxSphGetpaymentparams" data-id="{{item.id}}" data-order-number="{{item.orderNumber}}" data-money="{{item.amountReal}}" data-score="{{item.score}}">视频号支付</view>
+          <view class="action-btn btn-primary" wx:if="{{ item.status == 2 }}" catch:tap="confirmReceiveTap" data-order-number="{{item.orderNumber}}">确认收货</view>
+          <view class="action-btn btn-primary" wx:if="{{ item.status == 3 }}" catch:tap="goCommentOrder" data-order-number="{{item.orderNumber}}">评价商品</view>
           <view class="action-btn btn-default" hidden="{{(item.status==0 || item.status==-1) ? true : false}}" catch:tap="refundApply" data-id="{{item.id}}" data-amount='{{item.amountReal}}'>退换货</view>
         </view>
       </view>
@@ -116,9 +118,11 @@
       <!-- 订单底部 - 2个商品时只显示按钮 -->
       <view class="order-footer" wx:else>
         <view class="order-actions">
-          <view class="action-btn btn-default" hidden="{{item.status==0? false : true}}" catch:tap="cancelOrderTap" data-id="{{item.id}}">取消订单</view>
+          <view class="action-btn btn-default" hidden="{{item.status==0? false : true}}" catch:tap="cancelOrderTap" data-id="{{item.id}}"  data-order-number="{{item.orderNumber}}">取消订单</view>
           <view class="action-btn btn-primary" hidden="{{item.status==0? false : true}}" catch:tap="toPayTap" data-id="{{item.id}}" data-order-number="{{item.orderNumber}}" data-money="{{item.amountReal}}" data-score="{{item.score}}">立即付款</view>
           <view wx:if="{{ item.status == 0 && sphpay_open == '1' }}" class="action-btn btn-primary" catch:tap="wxSphGetpaymentparams" data-id="{{item.id}}" data-order-number="{{item.orderNumber}}" data-money="{{item.amountReal}}" data-score="{{item.score}}">视频号支付</view>
+          <view class="action-btn btn-primary" wx:if="{{ item.status == 2 }}" catch:tap="confirmReceiveTap" data-order-number="{{item.orderNumber}}">确认收货</view>
+          <view class="action-btn btn-primary" wx:if="{{ item.status == 3 }}" catch:tap="goCommentOrder" data-order-number="{{item.orderNumber}}">评价商品</view>
           <view class="action-btn btn-default" hidden="{{(item.status==0 || item.status==-1) ? true : false}}" catch:tap="refundApply" data-id="{{item.id}}" data-amount='{{item.amountReal}}'>退换货</view>
         </view>
       </view>

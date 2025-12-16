@@ -43,13 +43,15 @@ Page({
   },
   cancelOrderTap: function(e) {
     const that = this;
+    console.log("dataset", e.currentTarget.dataset)
     const orderId = e.currentTarget.dataset.id;
+    const orderNumber = e.currentTarget.dataset.orderNumber;
     wx.showModal({
       title: '确定要取消该订单吗？',
       content: '',
       success: function(res) {
         if (res.confirm) {
-          WXAPI.orderClose(wx.getStorageSync('token'), orderId).then(function(res) {
+          WXAPI.orderClose(wx.getStorageSync('token'), orderNumber).then(function(res) {
             if (res.code == 0) {
               that.data.page = 1
               that.orderList()
@@ -57,6 +59,34 @@ Page({
             }
           })
         }
+      }
+    })
+  },
+  confirmReceiveTap(e) {
+    const orderNumber = e.currentTarget.dataset.orderNumber
+    if (!orderNumber) return
+    wx.showModal({
+      title: '确认收货',
+      content: '请确认已收到商品且商品完好。确认后订单将完成，售后申请可能受限，是否继续？',
+      confirmText: '确认收货',
+      cancelText: '再等等',
+      success: res => {
+        if (!res.confirm) return
+        WXAPI.orderConfirm(wx.getStorageSync('token'), orderNumber).then(res2 => {
+          if (res2.code != 0) {
+            wx.showToast({
+              title: res2.msg || '确认收货失败',
+              icon: 'none'
+            })
+            return
+          }
+          wx.showToast({
+            title: '已确认收货'
+          })
+          this.setData({ page: 1 })
+          this.orderList()
+          this.getOrderStatistics()
+        })
       }
     })
   },
@@ -137,7 +167,7 @@ Page({
   },
   async wxSphGetpaymentparams(e) {
     const orderNumber = e.currentTarget.dataset.orderNumber
-    const res = await WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { pay_type: 'wxpay' })
+    const res = await WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { pay_type: 'wxpay', payType: 'wxpay' })
     if (res.code != 0 || !res.data) {
       wx.showToast({
         title: res.msg || '获取支付参数失败',
@@ -172,7 +202,7 @@ Page({
     const _this = this
     if (money <= 0) {
       // 直接使用余额支付
-      WXAPI.orderPay(wx.getStorageSync('token'), orderNumber).then(function (res) {
+      WXAPI.orderPay(wx.getStorageSync('token'), orderNumber, { payType: 'balance' }).then(function (res) {
         _this.data.page = 1
         _this.orderList()
         _this.getOrderStatistics()
@@ -323,7 +353,13 @@ Page({
   goOrderDetail(e) {
     const item = e.currentTarget.dataset.item
     wx.navigateTo({
-      url: '/pages/order-details/index?id=' + item.id,
+      url: '/pages/order-details/index?id=' + item.orderNumber,
+    })
+  },
+  goCommentOrder(e) {
+    const orderNumber = e.currentTarget.dataset.orderNumber
+    wx.navigateTo({
+      url: '/pages/order-details/index?id=' + orderNumber,
     })
   },
 })
