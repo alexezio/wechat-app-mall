@@ -105,10 +105,13 @@ const WXAPIAdapter = {
   async banners(params) {
     try {
       const type = params?.type || 'index'
+      console.log('[适配器] 请求 banner，类型:', type)
       const res = await HomeAPI.getBanners(type)
+      console.log('[适配器] banner 原始响应:', res)
       
       // 转换字段名：pic_url -> picUrl, link_url -> linkUrl
       if (res.code === 0 && res.data && Array.isArray(res.data)) {
+        console.log('[适配器] banner 数据是数组，长度:', res.data.length)
         const converted = res.data.map(item => ({
           id: item.id,
           picUrl: item.pic_url,
@@ -118,11 +121,14 @@ const WXAPIAdapter = {
           orderSort: item.order_sort,
           status: item.status
         }))
+        console.log('[适配器] banner 转换后:', converted)
         return { code: 0, data: converted }
       }
       
+      console.warn('[适配器] banner 返回格式不符合预期:', res)
       return res
     } catch (error) {
+      console.error('[适配器] banner 加载错误:', error)
       return { code: -1, msg: error.message || error.msg }
     }
   },

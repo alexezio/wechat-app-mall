@@ -34,17 +34,17 @@ function request(url, method = 'GET', data = {}, needAuth = false) {
         
         if (res.statusCode === 200) {
           // 后端返回格式: {code: 0, msg: "success", data: {...}}
-          if (res.data && res.data.code === 0) {
+          if (res.data) {
+            // 不管 code 是什么，都返回给上层处理
             resolve(res.data)
           } else {
-            // 业务错误
-            const errMsg = (res.data && res.data.msg) || '请求失败'
-            console.error('[API] 业务错误:', errMsg, res.data)
+            // 没有返回数据
+            console.error('[API] 响应数据为空:', res)
             wx.showToast({
-              title: errMsg,
+              title: '响应数据为空',
               icon: 'none'
             })
-            reject(res.data)
+            reject({ code: -1, msg: '响应数据为空' })
           }
         } else {
           // HTTP错误
@@ -53,7 +53,7 @@ function request(url, method = 'GET', data = {}, needAuth = false) {
             title: `请求失败(${res.statusCode})`,
             icon: 'none'
           })
-          reject(res)
+          reject({ code: -1, msg: `HTTP错误: ${res.statusCode}` })
         }
       },
       fail: (error) => {

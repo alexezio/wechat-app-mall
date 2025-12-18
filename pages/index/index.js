@@ -207,19 +207,30 @@ Page({
   async initBanners(){
     const _data = {}
     // 读取头部轮播图
+    console.log('[首页] 开始加载 banner...')
     const res1 = await WXAPI.banners({
       type: 'index'
     })
+    console.log('[首页] banner 接口返回:', res1)
+    
     if (res1.code == 700) {
       wx.showModal({
         title: '提示',
         content: '请在后台添加 banner 轮播图片，自定义类型填写 index',
         showCancel: false
       })
-    } else {
+    } else if (res1.code == 0) {
+      console.log('[首页] banner 数据:', res1.data)
       _data.banners = res1.data
+    } else {
+      console.error('[首页] banner 加载失败:', res1)
+      wx.showToast({
+        title: res1.msg || 'banner加载失败',
+        icon: 'none'
+      })
     }
     this.setData(_data)
+    console.log('[首页] banner 设置完成，数量:', (_data.banners || []).length)
   },
   onShow: function(e){
     this.setData({
