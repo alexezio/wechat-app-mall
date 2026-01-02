@@ -238,6 +238,18 @@ picker {
   width: 100%;
 }
 
+/* 多级选择器样式优化 */
+picker[mode="multiSelector"] .van-cell__value {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+picker[mode="multiSelector"] .van-cell__value:empty::before {
+  content: '请选择省市区街道';
+  color: #cbd5e0;
+  font-weight: 400;
+}
+
 .hui {
   color: #999;
 }

@@ -37,7 +37,7 @@ module.exports = {
     </swiper>
   </view>
 </view>
-<view class="jd-category-container">
+<!-- <view class="jd-category-container">
   <view class="jd-category-grid">
     <view class="jd-category-item" wx:for="{{categories}}" wx:key="id" bindtap="tabClick" data-id="{{item.id}}">
       <view class="jd-category-icon-wrap">
@@ -52,7 +52,7 @@ module.exports = {
       <text class="jd-category-name">{{item.name}}</text>
     </view>
   </view>
-</view>
+</view> -->
 <view class="jd-notice-container" wx:if="{{noticeList}}">
   <swiper class="jd-notice-swiper" vertical autoplay circular interval="8000">
     <swiper-item wx:for="{{noticeList.dataList}}" wx:key="id">

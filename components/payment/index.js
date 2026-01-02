@@ -61,7 +61,8 @@ Component({
       });
     },
     async submit() {
-      const orderNumber = this.data.nextAction && (this.data.nextAction.orderNumber || this.data.nextAction.id)
+      console.log(this.data)
+      const orderNumber = this.data.nextAction && this.data.nextAction.orderNumber
       if (!orderNumber) {
         wx.showModal({
           content: '缺少订单号，无法发起支付',

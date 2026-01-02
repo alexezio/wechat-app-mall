@@ -3,6 +3,7 @@ const WXAPI = require('apifm-wxapi')
 /**
  * type: order 支付订单 recharge 充值 paybill 优惠买单
  * data: 扩展数据对象，用于保存参数
+ * orderId: 如果type是order，这个参数应该传orderNumber（订单号）而不是订单id
  */
 function wxpay(type, money, orderId, redirectUrl, data, content) {
   const postData = {
@@ -15,7 +16,8 @@ function wxpay(type, money, orderId, redirectUrl, data, content) {
     postData.remark = "支付订单 ：" + orderId;
     postData.nextAction = {
       type: 0,
-      id: orderId
+      id: orderId,
+      orderNumber: orderId  // 这里的orderId参数应该传入orderNumber
     };
   }
   if (type === 'paybill') {

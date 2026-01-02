@@ -8,27 +8,94 @@ Page({
     openid: '',
     nick: '',
     step: 1, // 1-获取手机号 2-完善信息
-    loading: false
+    loading: false,
+    agreeProtocol: false // 是否同意隐私政策
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     // 获取openid（从全局或URL参数）
     const app = getApp()
-    const openid = options.openid || app.globalData.openid || wx.getStorageSync('openid')
+    let openid = options.openid || app.globalData.openid || wx.getStorageSync('openid')
     
+    // 如果没有openid，尝试获取
     if (!openid) {
-      wx.showModal({
-        title: '提示',
-        content: '请先获取登录凭证',
-        showCancel: false,
-        success: () => {
-          wx.navigateBack()
+      wx.showLoading({ title: '初始化中...' })
+      
+      try {
+        // 尝试调用登录获取openid
+        const loginResult = await AUTH.login()
+        wx.hideLoading()
+        
+        if (loginResult.needRegister && loginResult.openid) {
+          // 获取到openid，需要注册
+          openid = loginResult.openid
+          this.setData({ openid })
+        } else if (loginResult.success) {
+          // 已经登录成功，直接返回
+          wx.showToast({
+            title: '您已登录',
+            icon: 'success'
+          })
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/index/index',
+              fail: () => {
+                wx.navigateBack()
+              }
+            })
+          }, 1500)
+          return
+        } else {
+          throw new Error('获取登录凭证失败')
         }
-      })
-      return
+      } catch (error) {
+        wx.hideLoading()
+        console.error('获取openid失败:', error)
+        wx.showModal({
+          title: '提示',
+          content: '获取登录凭证失败，请稍后重试',
+          showCancel: false,
+          success: () => {
+            wx.switchTab({
+              url: '/pages/index/index',
+              fail: () => {
+                wx.navigateBack()
+              }
+            })
+          }
+        })
+        return
+      }
+    } else {
+      this.setData({ openid })
     }
-    
-    this.setData({ openid })
+  },
+
+  /**
+   * 切换隐私政策勾选状态
+   */
+  toggleAgreeProtocol() {
+    this.setData({
+      agreeProtocol: !this.data.agreeProtocol
+    })
+  },
+
+  /**
+   * 查看用户协议
+   */
+  viewUserAgreement() {
+    wx.navigateTo({
+      url: '/subpackages/more/about/index?key=yhxy',
+    })
+  },
+
+  /**
+   * 查看隐私政策
+   */
+  viewPrivacyPolicy() {
+    wx.navigateTo({
+      url: '/subpackages/more/about/index?key=ysxy',
+    })
   },
 
   /**
@@ -36,6 +103,16 @@ Page({
    */
   async getPhoneNumber(e) {
     if (this.data.loading) return
+    
+    // 检查是否同意隐私政策
+    if (!this.data.agreeProtocol) {
+      wx.showToast({
+        title: '请先阅读并同意用户协议和隐私政策',
+        icon: 'none',
+        duration: 2500
+      })
+      return
+    }
     
     try {
       this.setData({ loading: true })
@@ -145,4 +222,3 @@ Page({
     })
   }
 })
-

@@ -231,10 +231,12 @@ Page({
       let postJsonString = {};
       postJsonString.token = wx.getStorageSync('token');
       postJsonString.orderId = this.data.orderId;
+      postJsonString.orderNumber = this.data.orderSn; // 添加订单号
       let reputations = [];
       let i = 0;
       while (e.detail.value["orderGoodsId" + i]) {
         let orderGoodsId = e.detail.value["orderGoodsId" + i];
+        let goodsId = e.detail.value["goodsId" + i]; // 获取商品ID
         let goodReputation = e.detail.value["goodReputation" + i];
         const goodReputationNumber = goodReputation
         let goodReputationRemark = e.detail.value["goodReputationRemark" + i];
@@ -251,6 +253,7 @@ Page({
 
         let reputations_json = {};
         reputations_json.id = orderGoodsId;
+        reputations_json.goodsId = goodsId; // 添加商品ID
         reputations_json.reputation = goodReputation;
         reputations_json.reputationNumber = goodReputationNumber
         reputations_json.remark = goodReputationRemark;
@@ -268,6 +271,7 @@ Page({
         i++;
       }
       postJsonString.reputations = reputations;
+      postJsonString.is_anonymous = e.detail.value.is_anonymous || false; // 添加是否匿名
       WXAPI.orderReputation({
         postJsonString: JSON.stringify(postJsonString)
       }).then(function (res) {

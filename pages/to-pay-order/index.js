@@ -51,6 +51,8 @@ Page({
     shopIndex: -1,
     pageIsEnd: false,
 
+    addressList: [], // 用户的所有收货地址
+    showAddressSelector: false, // 是否显示地址选择弹窗
 
     bindMobileStatus: 0, // 0 未判断 1 已绑定手机号码 2 未绑定手机号码
     userScore: 0, // 用户可用积分
@@ -87,6 +89,17 @@ Page({
   onShow() {
     if (this.data.pageIsEnd) {
       return
+    }
+    // 检查是否需要刷新地址（从添加/编辑地址页返回时）
+    if (this.data.needRefreshAddress) {
+      this.setData({ needRefreshAddress: false });
+      // 只刷新地址，不重新加载整个页面
+      AUTH.checkHasLogined().then(isLogined => {
+        if (isLogined) {
+          this.initShippingAddress();
+        }
+      });
+      return;
     }
     this.doneShow()
   },
@@ -282,6 +295,10 @@ Page({
     }
     if (this.data.pingtuanOpenId) {
       postData.pingtuanOpenId = this.data.pingtuanOpenId
+    }
+    // 传递收货地址ID（重要！后端需要）
+    if (postData.peisongType == 'kd' && this.data.curAddressData && this.data.curAddressData.id) {
+      postData.shippingAddressId = this.data.curAddressData.id;
     }
     if (postData.peisongType == 'kd' && this.data.curAddressData && this.data.curAddressData.provinceId) {
       postData.provinceId = this.data.curAddressData.provinceId;
@@ -721,24 +738,57 @@ Page({
       // 没余额
       this.setData({
         orderId,
+        orderNumber,
         money: res.data.amountReal,
         paymentShow: true,
         nextAction: {
           type: 0,
-          id: orderId
+          id: orderId,
+          orderNumber: orderNumber || orderId
         }
       })
     }
   },
   async initShippingAddress() {
-    const res = await WXAPI.defaultAddress(getToken())
-    if (res.code == 0) {
+    console.log('[订单确认页] initShippingAddress 开始执行')
+    // 查询用户的所有收货地址
+    const res = await WXAPI.queryAddress()
+    console.log('[订单确认页] WXAPI.queryAddress() 返回结果:', res)
+    if (res.code == 0 && res.data && res.data.length > 0) {
+      console.log('[订单确认页] 地址查询成功，数量:', res.data.length)
+      // 转换字段格式
+      const addressList = res.data.map(item => ({
+        id: item.id,
+        linkMan: item.link_man || item.linkMan,
+        mobile: item.mobile,
+        address: item.address,
+        code: item.code,
+        provinceId: item.province_id || item.provinceId,
+        cityId: item.city_id || item.cityId,
+        districtId: item.area_id || item.district_id || item.districtId,
+        streetId: item.street_id || item.streetId,
+        provinceName: item.province_name || item.provinceName,
+        cityName: item.city_name || item.cityName,
+        districtName: item.area_name || item.district_name || item.districtName,
+        streetName: item.street_name || item.streetName,
+        isDefault: item.is_default || item.isDefault,
+        latitude: item.latitude,
+        longitude: item.longitude
+      }))
+      
+      // 查找默认地址
+      const defaultAddress = addressList.find(addr => addr.isDefault)
+      console.log('[订单确认页] 默认地址:', defaultAddress)
+      console.log('[订单确认页] 设置地址列表，总数:', addressList.length)
       this.setData({
-        curAddressData: res.data.info
+        curAddressData: defaultAddress || addressList[0], // 如果没有默认地址，使用第一个
+        addressList: addressList // 保存地址列表供后续使用
       });
     } else {
+      console.log('[订单确认页] 无地址或查询失败')
       this.setData({
-        curAddressData: null
+        curAddressData: null,
+        addressList: []
       });
     }
     this.processYunfei();
@@ -810,14 +860,65 @@ Page({
     this.createOrder();
   },
   addAddress: function () {
+    // 关闭弹窗（如果打开了）
+    this.setData({
+      showAddressSelector: false
+    })
     wx.navigateTo({
       url: "/pages/address-add/index"
     })
   },
   selectAddress: function () {
-    wx.navigateTo({
-      url: "/pages/select-address/index"
+    // 如果有地址列表，显示选择弹窗
+    if (this.data.addressList && this.data.addressList.length > 0) {
+      this.setData({
+        showAddressSelector: true
+      })
+    } else {
+      // 如果没有地址，跳转到添加地址页
+      wx.navigateTo({
+        url: "/pages/address-add/index"
+      })
+    }
+  },
+  // 关闭地址选择弹窗
+  closeAddressSelector: function() {
+    this.setData({
+      showAddressSelector: false
     })
+  },
+  // 选择某个地址（弹窗中）
+  onSelectAddress: function(e) {
+    const index = e.currentTarget.dataset.index
+    const selectedAddress = this.data.addressList[index]
+    this.setData({
+      curAddressData: selectedAddress,
+      showAddressSelector: false
+    })
+    // 重新计算运费
+    this.processYunfei()
+  },
+  // 选择某个地址（页面内联）
+  onSelectAddressInline: function(e) {
+    const index = e.currentTarget.dataset.index
+    const selectedAddress = this.data.addressList[index]
+    this.setData({
+      curAddressData: selectedAddress
+    })
+    // 重新计算运费
+    this.processYunfei()
+  },
+  // 地址选择变化（单选框改变）
+  onAddressChange: function(e) {
+    const addressId = e.detail
+    const selectedAddress = this.data.addressList.find(addr => addr.id === addressId)
+    if (selectedAddress) {
+      this.setData({
+        curAddressData: selectedAddress
+      })
+      // 重新计算运费
+      this.processYunfei()
+    }
   },
   bindChangeCoupon: function (e) {
     const selIndex = e.detail.value;

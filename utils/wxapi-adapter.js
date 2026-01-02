@@ -15,6 +15,7 @@ const {
   FavoriteAPI, 
   HistoryAPI,
   AddressAPI,
+  RegionAPI,
   FeedbackAPI 
 } = API
 
@@ -681,11 +682,83 @@ const WXAPIAdapter = {
   },
 
   /**
+   * 地址详情
+   */
+  async addressDetail(token, id) {
+    try {
+      // 兼容两种调用方式：addressDetail(token, id) 或 addressDetail(id)
+      const addressId = typeof token === 'number' ? token : id
+      const res = await AddressAPI.getDetail(addressId)
+      
+      if (res.code === 0 && res.data) {
+        // 转换字段格式为旧API格式
+        return {
+          code: 0,
+          msg: 'success',
+          data: {
+            info: res.data
+          }
+        }
+      }
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message }
+    }
+  },
+
+  /**
    * 添加地址
    */
   async addAddress(token, data) {
     try {
-      const res = await AddressAPI.add(data)
+      // 兼容两种调用方式：addAddress(token, data) 或 addAddress(data)
+      const addressData = (typeof token === 'object' && !data) ? token : data
+      
+      // 转换字段格式：前端camelCase -> 后端snake_case
+      const requestData = {
+        link_man: addressData.linkMan,
+        mobile: addressData.mobile,
+        address: addressData.address,
+        is_default: addressData.isDefault === 'true' || addressData.isDefault === true
+      }
+      
+      // 邮政编码
+      if (addressData.code) requestData.code = addressData.code
+      
+      // 省市区街道 - 优先使用 code，兼容旧的 id
+      if (addressData.provinceCode) {
+        requestData.province_code = addressData.provinceCode
+      } else if (addressData.provinceId) {
+        // 兼容旧字段：如果传的是ID，尝试从对应的选择器中获取code
+        requestData.province_code = addressData.provinceId
+      }
+      
+      if (addressData.cityCode) {
+        requestData.city_code = addressData.cityCode
+      } else if (addressData.cityId) {
+        requestData.city_code = addressData.cityId
+      }
+      
+      if (addressData.areaCode) {
+        requestData.area_code = addressData.areaCode
+      } else if (addressData.districtId) {
+        // district -> area
+        requestData.area_code = addressData.districtId
+      }
+      
+      if (addressData.streetCode) {
+        requestData.street_code = addressData.streetCode
+      } else if (addressData.streetId) {
+        requestData.street_code = addressData.streetId
+      }
+      
+      // GPS定位
+      if (addressData.latitude) requestData.latitude = addressData.latitude
+      if (addressData.longitude) requestData.longitude = addressData.longitude
+      
+      console.log('[适配器] addAddress 转换后的数据:', requestData)
+      
+      const res = await AddressAPI.add(requestData)
       return res
     } catch (error) {
       return { code: -1, msg: error.message }
@@ -697,7 +770,53 @@ const WXAPIAdapter = {
    */
   async updateAddress(token, data) {
     try {
-      const res = await AddressAPI.update(data)
+      // 兼容两种调用方式：updateAddress(token, data) 或 updateAddress(data)
+      const addressData = (typeof token === 'object' && !data) ? token : data
+      
+      // 转换字段格式：前端camelCase -> 后端snake_case
+      const requestData = {
+        id: addressData.id
+      }
+      
+      if (addressData.linkMan) requestData.link_man = addressData.linkMan
+      if (addressData.mobile) requestData.mobile = addressData.mobile
+      if (addressData.address) requestData.address = addressData.address
+      if (addressData.code !== undefined) requestData.code = addressData.code
+      
+      // 省市区街道 - 优先使用 code，兼容旧的 id
+      if (addressData.provinceCode) {
+        requestData.province_code = addressData.provinceCode
+      } else if (addressData.provinceId) {
+        requestData.province_code = addressData.provinceId
+      }
+      
+      if (addressData.cityCode) {
+        requestData.city_code = addressData.cityCode
+      } else if (addressData.cityId) {
+        requestData.city_code = addressData.cityId
+      }
+      
+      if (addressData.areaCode) {
+        requestData.area_code = addressData.areaCode
+      } else if (addressData.districtId) {
+        requestData.area_code = addressData.districtId
+      }
+      
+      if (addressData.streetCode) {
+        requestData.street_code = addressData.streetCode
+      } else if (addressData.streetId) {
+        requestData.street_code = addressData.streetId
+      }
+      
+      if (addressData.latitude) requestData.latitude = addressData.latitude
+      if (addressData.longitude) requestData.longitude = addressData.longitude
+      if (addressData.isDefault !== undefined) {
+        requestData.is_default = addressData.isDefault === 'true' || addressData.isDefault === true
+      }
+      
+      console.log('[适配器] updateAddress 转换后的数据:', requestData)
+      
+      const res = await AddressAPI.update(requestData)
       return res
     } catch (error) {
       return { code: -1, msg: error.message }
@@ -709,7 +828,95 @@ const WXAPIAdapter = {
    */
   async deleteAddress(token, id) {
     try {
-      const res = await AddressAPI.delete(id)
+      // 兼容两种调用方式：deleteAddress(token, id) 或 deleteAddress(id)
+      const addressId = typeof token === 'number' ? token : id
+      const res = await AddressAPI.delete(addressId)
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message }
+    }
+  },
+
+  /**
+   * 设置默认地址
+   */
+  async setDefaultAddress(token, id) {
+    try {
+      // 兼容两种调用方式：setDefaultAddress(token, id) 或 setDefaultAddress(id)
+      const addressId = typeof token === 'number' ? token : id
+      const res = await AddressAPI.setDefault(addressId)
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message }
+    }
+  },
+
+  /**
+   * 获取省份列表（V2版本）
+   */
+  async provinceV2() {
+    try {
+      const res = await RegionAPI.getProvinces()
+      if (res.code === 0 && res.data) {
+        // 确保数据格式正确：需要 id, name, code 字段
+        const provinces = res.data.map(item => ({
+          id: item.id || item.code,  // 兼容：如果没有id，使用code
+          name: item.name,
+          code: item.code
+        }))
+        return { code: 0, msg: res.msg || 'success', data: provinces }
+      }
+      return res
+    } catch (error) {
+      return { code: -1, msg: error.message }
+    }
+  },
+
+  /**
+   * 获取下级区域（V2版本）
+   * @param {string|number} parentIdOrCode - 上级区域ID或编码
+   * 
+   * 根据 parentIdOrCode 的值自动判断查询类型：
+   * - 如果是省份编码（如"310000"），返回城市列表
+   * - 如果是城市编码（如"310100"），返回区县列表
+   * - 如果是区县编码（如"310115"），返回街道列表
+   */
+  async nextRegionV2(parentIdOrCode) {
+    try {
+      const parentCode = String(parentIdOrCode)
+      let res
+      
+      // 根据编码长度和规则判断层级
+      // 省：6位，后4位为0（如 110000）
+      // 市：6位，后2位为0（如 110100）
+      // 区：6位，后2位不为0（如 110101）
+      // 街道：9位（如 110101001）
+      
+      if (parentCode.endsWith('0000')) {
+        // 省级编码，查询城市
+        res = await RegionAPI.getCities(parentCode)
+      } else if (parentCode.endsWith('00') && parentCode.length === 6) {
+        // 市级编码，查询区县
+        res = await RegionAPI.getAreas(parentCode)
+      } else if (parentCode.length === 6) {
+        // 区级编码，查询街道
+        res = await RegionAPI.getStreets(parentCode)
+      } else {
+        return { code: -1, msg: '无效的区域编码' }
+      }
+      
+      if (res.code === 0 && res.data) {
+        // 确保数据格式正确：需要 id, name, code 字段
+        const regions = res.data.map(item => ({
+          id: item.id || item.code,  // 兼容：如果没有id，使用code
+          name: item.name,
+          code: item.code,
+          provinceCode: item.provinceCode,
+          cityCode: item.cityCode,
+          areaCode: item.areaCode
+        }))
+        return { code: 0, msg: res.msg || 'success', data: regions }
+      }
       return res
     } catch (error) {
       return { code: -1, msg: error.message }
@@ -828,7 +1035,7 @@ const WXAPIAdapter = {
 
   /**
    * 提交订单评价
-   * @param {object} params - { postJsonString: JSON.stringify({ token, orderId, reputations }) }
+   * @param {object} params - { postJsonString: JSON.stringify({ token, orderId, orderNumber, reputations, is_anonymous }) }
    */
   async orderReputation(params) {
     try {
@@ -836,20 +1043,21 @@ const WXAPIAdapter = {
         return { code: -1, msg: '缺少评价参数' }
       }
       const data = JSON.parse(params.postJsonString)
-      if (!data.orderId || !data.reputations || !Array.isArray(data.reputations)) {
+      if (!data.orderNumber || !data.reputations || !Array.isArray(data.reputations)) {
         return { code: -1, msg: '评价参数格式错误' }
       }
       
-      // 转换为后端需要的格式
+      // 转换为服务端需要的格式
       const requestData = {
-        order_id: data.orderId,
-        reputations: data.reputations.map(r => ({
-          order_goods_id: r.id,
-          reputation: r.reputation,
-          reputation_score: r.reputationNumber || r.reputation,
-          remark: r.remark || '',
+        order_number: data.orderNumber,
+        reviews: data.reputations.map(r => ({
+          goods_id: parseInt(r.goodsId),
+          order_goods_id: parseInt(r.id),
+          score: parseInt(r.reputationNumber), // 1-5星
+          content: r.remark || null,
           pics: r.pics || []
-        }))
+        })),
+        is_anonymous: data.is_anonymous || false
       }
       
       const res = await OrderAPI.submitReputation(requestData)
@@ -1455,6 +1663,11 @@ const WXAPIAdapter = {
       
       // 添加收货地址信息
       if (postData.peisongType === 'kd') {
+        // 优先使用收货地址ID（服务端要求）
+        if (postData.shippingAddressId) {
+          orderData.shipping_address_id = postData.shippingAddressId
+        }
+        // 以下字段为兼容旧版本保留
         if (postData.linkMan) orderData.link_man = postData.linkMan
         if (postData.mobile) orderData.mobile = postData.mobile
         if (postData.address) orderData.address = postData.address

@@ -164,10 +164,11 @@ Page({
   },
   readConfigVal() {
     const mallName = wx.getStorageSync('mallName')
+    // 无论 mallName 是否存在，都要加载分类和商品列表
+    this.categories()
     if (!mallName) {
       return
     }
-    this.categories()
     wx.setNavigationBarTitle({
       title: mallName
     })

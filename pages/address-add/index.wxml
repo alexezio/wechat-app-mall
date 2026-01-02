@@ -21,20 +21,20 @@
     </view>
     
     <view class="form-section">
-      <picker bindchange="provinceChange" value="{{pIndex}}" range="{{provinces}}" range-key="name">
-        <van-cell custom-class="custom-cell" title="省份" value="{{provinces[pIndex].name}}" is-link />
-      </picker>
-      <picker wx:if="{{cities}}" bindchange="cityChange" value="{{cIndex}}" range="{{cities}}" range-key="name">
-        <van-cell custom-class="custom-cell" title="城市" value="{{cities[cIndex].name}}" is-link />
-      </picker>
-      <picker wx:if="{{areas}}" bindchange="areaChange" value="{{aIndex}}" range="{{areas}}" range-key="name">
-        <van-cell custom-class="custom-cell" title="区县" value="{{areas[aIndex].name}}" is-link />
-      </picker>
-      <picker wx:if="{{streets}}" bindchange="streetChange" value="{{sIndex}}" range="{{streets}}" range-key="name">
-        <van-cell custom-class="custom-cell" title="街道/镇" value="{{streets[sIndex].name}}" is-link />
-      </picker>
-      <picker wx:if="{{communities}}" bindchange="communityChange" value="{{ccIndex}}" range="{{communities}}" range-key="name">
-        <van-cell custom-class="custom-cell" title="社区/村委会" value="{{communities[ccIndex].name}}" is-link />
+      <!-- 多级联动选择器 -->
+      <picker 
+        mode="multiSelector" 
+        bindchange="onRegionChange" 
+        bindcolumnchange="onRegionColumnChange"
+        value="{{regionIndexes}}" 
+        range="{{regionColumns}}" 
+        range-key="name">
+        <van-cell 
+          custom-class="custom-cell" 
+          title="所在地区" 
+          value="{{regionText || '请选择省市区街道'}}" 
+          is-link 
+        />
       </picker>
       <van-field
         custom-class="custom-field"

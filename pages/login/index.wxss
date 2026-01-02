@@ -65,6 +65,50 @@
   margin-bottom: 60rpx;
 }
 
+/* 隐私政策勾选 */
+.protocol-section {
+  margin-bottom: 40rpx;
+}
+
+.protocol-checkbox {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 36rpx;
+  height: 36rpx;
+  min-width: 36rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  margin-top: 4rpx;
+  transition: all 0.3s ease;
+}
+
+.checkbox.checked {
+  background: #07c160;
+  border-color: #07c160;
+}
+
+.protocol-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 44rpx;
+}
+
+.protocol-link {
+  color: #07c160;
+  font-weight: 500;
+  text-decoration: underline;
+  padding: 0 4rpx;
+}
+
 /* 授权按钮 */
 .auth-button {
   width: 100%;
@@ -80,6 +124,13 @@
   box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.3);
   border: none;
   margin-bottom: 32rpx;
+  transition: all 0.3s ease;
+}
+
+.auth-button.disabled {
+  background: #e5e5e5;
+  color: #999;
+  box-shadow: none;
 }
 
 .auth-button::after {
@@ -151,18 +202,4 @@
   padding: 20rpx 0;
 }
 
-/* 用户协议 */
-.agreement {
-  position: fixed;
-  bottom: 60rpx;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 24rpx;
-  color: #999;
-}
-
-.agreement .link {
-  color: #07c160;
-}
 

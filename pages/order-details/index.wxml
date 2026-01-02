@@ -127,6 +127,7 @@
           />
           <van-cell-group wx:if="{{orderDetail.orderInfo.status==3}}" title="评价" class="reputation-group">
             <input name="orderGoodsId{{index}}" value="{{item.id}}" style="display:none;" />
+            <input name="goodsId{{index}}" value="{{item.goodsId}}" style="display:none;" />
             <van-cell title="满意度">
               <van-rate name="goodReputation{{index}}" value="{{ 5 }}" />
             </van-cell>
@@ -153,6 +154,11 @@
         </block>
       </view>
       <view class="action-btn-wrap" wx:if="{{orderDetail.orderInfo.status==3}}">
+        <van-cell-group>
+          <van-cell title="匿名评价">
+            <switch name="is_anonymous" slot="right-icon" />
+          </van-cell>
+        </van-cell-group>
         <button class="action-btn primary-btn" formType="submit">提交评价</button>
       </view>
     </form>

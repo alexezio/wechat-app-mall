@@ -443,3 +443,120 @@ form {
   color: #999999;
   line-height: 34rpx;
 }
+
+/* 地址选择弹窗样式 */
+.address-selector-popup {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.popup-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.address-item {
+  padding: 20rpx 0;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.address-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-right: 16rpx;
+}
+
+.address-mobile {
+  font-size: 28rpx;
+  color: #666;
+  flex: 1;
+}
+
+.default-tag {
+  font-size: 22rpx;
+  color: #e64340;
+  border: 1rpx solid #e64340;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+}
+
+.address-detail {
+  margin-bottom: 8rpx;
+}
+
+.address-region {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.address-full {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+}
+
+.add-new-address {
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #eee;
+}
+
+/* 页面内联地址列表样式 */
+.address-cell-item {
+  border-bottom: 1rpx solid #f5f5f5 !important;
+}
+
+.address-item-inline {
+  padding: 8rpx 0;
+  width: 100%;
+}
+
+.address-header-inline {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.address-name-inline {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-right: 16rpx;
+}
+
+.address-mobile-inline {
+  font-size: 28rpx;
+  color: #666;
+  flex: 1;
+}
+
+.default-tag-inline {
+  font-size: 22rpx;
+  color: #e64340;
+  border: 1rpx solid #e64340;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+  background: #fff5f5;
+}
+
+.address-detail-inline {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+  line-height: 1.4;
+}
+
+.address-full-inline {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+}

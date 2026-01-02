@@ -110,17 +110,40 @@
       <van-cell wx:if="{{peisongType == 'zq' && shopIndex != -1}}" title="电话" value="{{shops[shopIndex].linkPhone}}" is-link bind:click="callMobile" />
       <van-cell wx:if="{{peisongType == 'zq' && shopIndex != -1}}" title="地址" title-width="64rpx" value="{{shops[shopIndex].address}}" is-link bind:click="goMap" />
       
+      <!-- 地址选择区域 -->
       <view class="address-box" wx:if="{{peisongType == 'kd' && isNeedLogistics > 0}}">
-        <van-cell wx:if="{{!curAddressData}}" icon="add-o" title="新增收货地址" is-link bind:click="addAddress" />
-        <view class="show-address" hidden="{{!curAddressData}}" bindtap="selectAddress">
-          <view class="l">
-            <view class="name-tel">{{curAddressData.linkMan}} {{curAddressData.mobile}}</view>
-            <view class="addr-text">{{curAddressData.address}}</view>
-          </view>
-          <view class="r">
-            <image class="next" src="/images/icon/next.png"></image>
-          </view>
-        </view>
+        <!-- 如果没有地址，只显示新增地址 -->
+        <van-cell wx:if="{{addressList.length == 0}}" icon="add-o" title="新增收货地址" is-link bind:click="addAddress" />
+        
+        <!-- 如果有地址，显示地址列表 -->
+        <van-cell-group wx:if="{{addressList.length > 0}}">
+          <van-radio-group value="{{ curAddressData ? curAddressData.id : '' }}" bind:change="onAddressChange">
+            <van-cell 
+              wx:for="{{ addressList }}" 
+              wx:key="id" 
+              clickable
+              data-index="{{ index }}"
+              bind:click="onSelectAddressInline"
+              custom-class="address-cell-item"
+            >
+              <view slot="title" class="address-item-inline">
+                <view class="address-header-inline">
+                  <text class="address-name-inline">{{ item.linkMan }}</text>
+                  <text class="address-mobile-inline">{{ item.mobile }}</text>
+                  <text wx:if="{{ item.isDefault }}" class="default-tag-inline">默认</text>
+                </view>
+                <view class="address-detail-inline">
+                  {{ item.provinceName }} {{ item.cityName }} {{ item.districtName }} {{ item.streetName }}
+                </view>
+                <view class="address-full-inline">{{ item.address }}</view>
+              </view>
+              <van-radio slot="right-icon" name="{{ item.id }}" />
+            </van-cell>
+          </van-radio-group>
+          
+          <!-- 新增地址按钮 -->
+          <van-cell icon="add-o" title="新增其他地址" is-link bind:click="addAddress" />
+        </van-cell-group>
       </view>
       <van-field
         wx:if="{{peisongType == 'zq'}}"
@@ -140,7 +163,7 @@
         clearable
         required
         placeholder="请输入手机号码">
-        <van-button slot="button" size="small" type="danger" bind:tap="bindMobile">自动获取</van-button>
+        <!-- <van-button slot="button" size="small" type="danger" bind:tap="bindMobile">自动获取</van-button> -->
       </van-field>
       <block wx:if="{{ extRequired && extRequired.length > 0 }}">
         <van-field
@@ -327,3 +350,37 @@
   bind:cancel="paymentCancel"
   bind:ok="paymentOk"
 />
+
+<!-- 地址选择弹窗 -->
+<van-popup show="{{ showAddressSelector }}" position="bottom" bind:close="closeAddressSelector" closeable round>
+  <view class="address-selector-popup">
+    <view class="popup-title">选择收货地址</view>
+    <van-radio-group value="{{ curAddressData ? curAddressData.id : '' }}">
+      <van-cell-group>
+        <van-cell 
+          wx:for="{{ addressList }}" 
+          wx:key="id" 
+          clickable
+          data-index="{{ index }}"
+          bind:click="onSelectAddress"
+        >
+          <view slot="title" class="address-item">
+            <view class="address-header">
+              <text class="address-name">{{ item.linkMan }}</text>
+              <text class="address-mobile">{{ item.mobile }}</text>
+              <text wx:if="{{ item.isDefault }}" class="default-tag">默认</text>
+            </view>
+            <view class="address-detail">
+              <text class="address-region">{{ item.provinceName }} {{ item.cityName }} {{ item.districtName }} {{ item.streetName }}</text>
+            </view>
+            <view class="address-full">{{ item.address }}</view>
+          </view>
+          <van-radio slot="right-icon" name="{{ item.id }}" />
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+    <view class="add-new-address">
+      <van-button type="primary" size="large" bind:click="addAddress" block>新增收货地址</van-button>
+    </view>
+  </view>
+</van-popup>

@@ -199,6 +199,24 @@
   background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
 }
 
+.icon-logout {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+}
+
+/* 登出按钮特殊样式 */
+.logout-item {
+  margin-top: 8rpx;
+}
+
+.logout-text {
+  color: #ff5252;
+  font-weight: 600;
+}
+
+.logout-item:active {
+  background: rgba(255, 82, 82, 0.05);
+}
+
 /* 文字信息 */
 .item-info {
   display: flex;

@@ -54,11 +54,13 @@ Page({
     }
     this.setData({
       orderId: res.data.id,
+      orderNumber: res.data.orderNumber || res.data.order_number || res.data.id,
       money: res.data.amountReal,
       paymentShow: true,
       nextAction: {
         type: 0,
-        id: res.data.id
+        id: res.data.id,
+        orderNumber: res.data.orderNumber || res.data.order_number || res.data.id
       }
     })
   },

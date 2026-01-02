@@ -57,9 +57,42 @@ Page({
     })
   },
   loginOut() {
-    AUTH.loginOut()
-    wx.navigateTo({
-      url: '/pages/login/index',
+    wx.showModal({
+      title: '确认退出',
+      content: '退出后需要重新登录，确定要退出吗？',
+      confirmText: '确定退出',
+      cancelText: '取消',
+      confirmColor: '#ff5252',
+      success: (res) => {
+        if (res.confirm) {
+          // 清除旧系统的token
+          wx.removeStorageSync('token')
+          wx.removeStorageSync('uid')
+          wx.removeStorageSync('openid')
+          wx.removeStorageSync('mobile')
+          
+          // 清除新系统的jwt_token
+          wx.removeStorageSync('jwt_token')
+          wx.removeStorageSync('userInfo')
+          
+          // 清除其他可能的用户相关数据
+          wx.removeStorageSync('referrer')
+          
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success',
+            duration: 2000,
+            success: () => {
+              setTimeout(() => {
+                // 跳转到首页
+                wx.reLaunch({
+                  url: '/pages/index/index'
+                })
+              }, 2000)
+            }
+          })
+        }
+      }
     })
   },
 })

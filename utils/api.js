@@ -576,8 +576,21 @@ const AddressAPI = {
   },
 
   /**
+   * 获取地址详情
+   * @param {number} id - 地址ID
+   */
+  getDetail(id) {
+    return request(`/user/shipping-address/detail?id=${id}`, 'GET', {}, true)
+  },
+
+  /**
    * 添加地址
    * @param {object} data - 地址信息
+   * data: {
+   *   link_man, mobile, address,
+   *   province_code, city_code, area_code, street_code?,
+   *   is_default?, code?, latitude?, longitude?
+   * }
    */
   add(data) {
     return request('/user/shipping-address/add', 'POST', data, true)
@@ -596,7 +609,7 @@ const AddressAPI = {
    * @param {number} id - 地址ID
    */
   delete(id) {
-    return request(`/user/shipping-address/delete?id=${id}`, 'POST', {}, true)
+    return request('/user/shipping-address/delete', 'POST', { id }, true)
   },
 
   /**
@@ -604,7 +617,43 @@ const AddressAPI = {
    * @param {number} id - 地址ID
    */
   setDefault(id) {
-    return request(`/user/shipping-address/default?id=${id}`, 'POST', {}, true)
+    return request('/user/shipping-address/default', 'POST', { id }, true)
+  }
+}
+
+/**
+ * 地区数据API（四级：省-市-区-街道）
+ */
+const RegionAPI = {
+  /**
+   * 获取省份列表
+   */
+  getProvinces() {
+    return request('/region/provinces', 'GET')
+  },
+
+  /**
+   * 获取城市列表
+   * @param {string} provinceCode - 省份编码，如 "310000"
+   */
+  getCities(provinceCode) {
+    return request(`/region/cities?provincecode=${provinceCode}`, 'GET')
+  },
+
+  /**
+   * 获取区县列表
+   * @param {string} cityCode - 城市编码，如 "310100"
+   */
+  getAreas(cityCode) {
+    return request(`/region/areas?citycode=${cityCode}`, 'GET')
+  },
+
+  /**
+   * 获取街道列表（可选）
+   * @param {string} areaCode - 区县编码，如 "310115"
+   */
+  getStreets(areaCode) {
+    return request(`/region/streets?areacode=${areaCode}`, 'GET')
   }
 }
 
@@ -633,6 +682,7 @@ module.exports = {
   FavoriteAPI,
   HistoryAPI,
   AddressAPI,
+  RegionAPI,
   FeedbackAPI
 }
 
