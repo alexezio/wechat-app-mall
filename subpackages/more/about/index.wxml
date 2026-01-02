@@ -1,4 +1,10 @@
-<van-empty wx:if="{{!cmsPageDetail}}" description="请在后台添加内容" />
+<!-- 显示静态内容 -->
+<view wx:if="{{isStaticContent}}" class="content">
+  <mp-html content="{{staticContent.content}}" />
+</view>
+
+<!-- 显示CMS后台内容 -->
+<van-empty wx:elif="{{!cmsPageDetail}}" description="请在后台添加内容" />
 <view wx:else class="content">
   <mp-html content="{{cmsPageDetail.info.content}}" />
 </view>

@@ -3,3 +3,42 @@
   color: #333;
   line-height: 64rpx;
 }
+
+/* 协议内容样式 */
+.protocol-content h2 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin: 40rpx 0 30rpx 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.protocol-content h3 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin: 30rpx 0 20rpx 0;
+  line-height: 1.5;
+}
+
+.protocol-content p {
+  font-size: 28rpx;
+  color: #555;
+  line-height: 48rpx;
+  margin: 20rpx 0;
+  text-align: justify;
+}
+
+.protocol-content p strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.protocol-content .update-date,
+.protocol-content .effective-date {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 40rpx;
+  text-align: right;
+}
